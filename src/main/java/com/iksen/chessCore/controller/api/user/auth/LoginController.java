@@ -79,7 +79,8 @@ public class LoginController {
                     "user", Map.of(
                         "id", user.getId(),
                         "username", user.getUserName(),
-                        "email", user.getEmail()
+                        "email", user.getEmail(),
+                        "parentId", user.getParentId()
                     )
                 ));
 

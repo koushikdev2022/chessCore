@@ -1,4 +1,4 @@
-package com.iksen.chessCore.controller.api.user.auth.dummyService;
+package com.iksen.chessCore.controller.api.user.dummyService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

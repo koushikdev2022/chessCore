@@ -39,4 +39,7 @@ public class FirstStepUserDTO {
     @NotBlank(message = "Confirm password cannot be blank")
     @JsonProperty("confirm_password")
     private String confirmPassword;
+
+    @JsonProperty("parent_id")
+    private Long parentId;
 }

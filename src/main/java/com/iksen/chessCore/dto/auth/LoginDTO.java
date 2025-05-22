@@ -16,7 +16,7 @@ public class LoginDTO {
     @JsonProperty(value = "userNameOrEmail", access = JsonProperty.Access.WRITE_ONLY)
     private String userNameOrEmail;
     
-    @JsonProperty(value = "user_name", access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(value = "username", access = JsonProperty.Access.WRITE_ONLY)
     private String userName;
     
     @JsonProperty("password")

@@ -60,22 +60,22 @@ public class LoginController {
                 Optional<User> userOptional = loginServiceImpl.login(loginDTO);
                  
                 if (userOptional.isEmpty()) {
-                    return ResponseEntity.status(401).body(Map.of(
+                    return ResponseEntity.status(422).body(Map.of(
                         "status", false,
                         "message", "User not found",
-                        "status_code", 401
+                        "status_code", 422
                     ));
                 }
 
                 User user = userOptional.get();
-              
-                String jwt = jwtUtill.generateToken(user);
+               
+                String token = jwtUtill.generateToken(user);
 
                 return ResponseEntity.status(200).body(Map.of(
                     "status", true,
                     "message", "Login successful",
                     "status_code", 200,
-                    "jwt", jwt,
+                    "token", token,
                     "user", Map.of(
                         "id", user.getId(),
                         "username", user.getUserName(),
@@ -84,17 +84,17 @@ public class LoginController {
                 ));
 
             } catch (BadCredentialsException ex) {
-                return ResponseEntity.status(401).body(Map.of(
+                return ResponseEntity.status(422).body(Map.of(
                     "status", false,
                     "message", "Invalid username or password",
-                    "status_code", 401
+                    "status_code", 422
                 ));
             } catch (Exception e) {
                 e.printStackTrace();
-                return ResponseEntity.status(500).body(Map.of(
+                return ResponseEntity.status(400).body(Map.of(
                     "status", false,
                     "message", "Internal server error: " + e.getMessage(),
-                    "status_code", 500
+                    "status_code", 400
                 ));
             }
         }

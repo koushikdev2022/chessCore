@@ -42,24 +42,35 @@ public class JwtUtill {
     /**
      * Generate JWT token from user entity
      */
-   public String generateToken(User user) {
-    try {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
+        claims.put("firstName", user.getFirstName());
+        claims.put("lastName", user.getLastName());
         claims.put("username", user.getUserName());
         claims.put("email", user.getEmail());
+        claims.put("mobile", user.getMobile());
+        claims.put("avatar", user.getAvatar());
+        claims.put("otp", user.getOtp());
+        claims.put("otpExpire", user.getOtpExpire());
+        claims.put("oAuth", user.getOAuth());
+        claims.put("oauthProvider", user.getOauthProvider());
+        claims.put("parentId", user.getParentId());
+        claims.put("status", user.getStatus());
+        claims.put("isDeleted", user.getIsDeleted());
+        claims.put("createdAt", user.getCreatedAt().toString());
+        claims.put("updatedAt", user.getUpdatedAt().toString());
 
         return Jwts.builder()
             .setClaims(claims)
             .setSubject(user.getUserName())
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-            .signWith(SignatureAlgorithm.HS256, SECRET.getBytes())
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
-    } catch (Exception e) {
-        throw new RuntimeException("Error generating JWT", e);
     }
-}
+
+    
 
     /**
      * Extract all claims from token

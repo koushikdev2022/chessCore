@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,34 +34,41 @@ public class LoginController {
         @PostMapping("/login")
         public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
             try {
-                // Authenticate user
-                Authentication authentication = authenticationManager.authenticate(
+                if (loginDTO.getUserNameOrEmail() == null || loginDTO.getUserNameOrEmail().trim().isEmpty()) {
+                    return ResponseEntity.status(400).body(Map.of(
+                        "status", false,
+                        "message", "Username or email is required",
+                        "status_code", 400
+                    ));
+                }
+
+                if (loginDTO.getPassword() == null || loginDTO.getPassword().trim().isEmpty()) {
+                    return ResponseEntity.status(400).body(Map.of(
+                        "status", false,
+                        "message", "Password is required",
+                        "status_code", 400
+                    ));
+                }
+
+                authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                         loginDTO.getUserNameOrEmail(),
                         loginDTO.getPassword()
                     )
                 );
 
-                // Get user details after successful authentication
-                Optional<User> userOptional = loginServiceImpl.login(loginDTO); // Fixed parameter name
-                  if (userOptional.isEmpty()) {
+                Optional<User> userOptional = loginServiceImpl.login(loginDTO);
+                 
+                if (userOptional.isEmpty()) {
                     return ResponseEntity.status(401).body(Map.of(
                         "status", false,
                         "message", "User not found",
                         "status_code", 401
                     ));
                 }
-                if (!userOptional.isPresent()) {
-                    return ResponseEntity.status(401).body(Map.of(
-                        "status", false,
-                        "message", "User not found",
-                        "status_code", 401
-                    ));
-                }
-                
+
                 User user = userOptional.get();
-                
-                // Generate JWT token
+              
                 String jwt = jwtUtill.generateToken(user);
 
                 return ResponseEntity.status(200).body(Map.of(
@@ -71,17 +79,25 @@ public class LoginController {
                     "user", Map.of(
                         "id", user.getId(),
                         "username", user.getUserName(),
-                        "email", user.getEmail(),
-                        "fullName", user.getFirstName()
+                        "email", user.getEmail()
                     )
                 ));
+
+            } catch (BadCredentialsException ex) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "status", false,
+                    "message", "Invalid username or password",
+                    "status_code", 401
+                ));
             } catch (Exception e) {
+                e.printStackTrace();
                 return ResponseEntity.status(500).body(Map.of(
                     "status", false,
-                    "message", "Internal server error",
+                    "message", "Internal server error: " + e.getMessage(),
                     "status_code", 500
                 ));
             }
         }
+
 }
 

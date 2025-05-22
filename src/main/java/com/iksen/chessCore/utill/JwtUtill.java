@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -41,23 +42,24 @@ public class JwtUtill {
     /**
      * Generate JWT token from user entity
      */
-    public String generateToken(User user) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> userMap = objectMapper.convertValue(user, Map.class);
-            userMap.remove("password"); 
+   public String generateToken(User user) {
+    try {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("username", user.getUserName());
+        claims.put("email", user.getEmail());
 
-            return Jwts.builder()
-                    .setSubject(user.getUserName()) // Username as subject
-                    .claim("user", userMap) // Add the whole user object as a claim
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                    .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                    .compact();
-        } catch (Exception e) {
-            throw new RuntimeException("Error generating JWT", e);
-        }
+        return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(user.getUserName())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+            .signWith(SignatureAlgorithm.HS256, SECRET.getBytes())
+            .compact();
+    } catch (Exception e) {
+        throw new RuntimeException("Error generating JWT", e);
     }
+}
 
     /**
      * Extract all claims from token

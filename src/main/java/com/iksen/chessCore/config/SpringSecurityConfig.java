@@ -19,7 +19,6 @@ import com.iksen.chessCore.filter.JwtAuthenticationFilter;
 import com.iksen.chessCore.service.user.auth.login.CustomUserDetailsService;
 
 @Configuration
-
 @EnableWebSecurity(debug = true)
 public class SpringSecurityConfig {
 

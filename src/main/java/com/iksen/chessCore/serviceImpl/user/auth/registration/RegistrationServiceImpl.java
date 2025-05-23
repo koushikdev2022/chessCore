@@ -15,14 +15,14 @@ import com.iksen.chessCore.service.user.auth.registration.RegistrationService;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
-
-    private final PasswordEncoder passwordEncoder;
+                @Autowired
+                private  PasswordEncoder passwordEncoder;
                 @Autowired
                 private DummyUserRepo dummyUserRepository;
 
-                RegistrationServiceImpl(PasswordEncoder passwordEncoder) {
-                    this.passwordEncoder = passwordEncoder;
-                }
+                // RegistrationServiceImpl(PasswordEncoder passwordEncoder) {
+                //     this.passwordEncoder = passwordEncoder;
+                // }
                 @Override
                 public Optional<DummyUser> firstStep(FirstStepUserDTO dto) {
                     System.out.println(dto+"dtogggggggg");

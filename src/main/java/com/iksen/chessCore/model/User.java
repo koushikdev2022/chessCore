@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -79,6 +80,9 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAddress> addresses;
+    
 
     // Getters and Setters (you can use Lombok annotations like @Data to reduce boilerplate)
 }

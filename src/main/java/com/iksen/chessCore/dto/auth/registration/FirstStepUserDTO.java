@@ -3,6 +3,7 @@ package com.iksen.chessCore.dto.auth.registration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +41,7 @@ public class FirstStepUserDTO {
     @JsonProperty("confirm_password")
     private String confirmPassword;
 
+    @NotNull(message = "Parent ID cannot be null")
     @JsonProperty("parent_id")
     private Long parentId;
 }

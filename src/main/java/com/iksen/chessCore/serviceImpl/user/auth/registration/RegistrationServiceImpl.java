@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.FirstStepUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
+import com.iksen.chessCore.mapper.DummyUserMapper;
 import com.iksen.chessCore.model.DummyUser;
 import com.iksen.chessCore.repositary.DummyUserRepo;
 import com.iksen.chessCore.repositary.UserRepository;
@@ -44,5 +46,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                 public Optional<SecondStepDTO> secondStep(SecondStepDTO secondStepDTO){
                     
                     return Optional.ofNullable(secondStepDTO);
+                }
+                @Override
+                public Optional<DummyUserDTO> findDummyUser(Long id){
+                    return dummyUserRepository.findById(id)
+                    .map(DummyUserMapper::toDTO);
                 }
 }

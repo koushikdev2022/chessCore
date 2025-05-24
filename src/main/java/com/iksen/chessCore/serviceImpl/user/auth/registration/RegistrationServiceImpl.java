@@ -68,5 +68,13 @@ public class RegistrationServiceImpl implements RegistrationService {
                     UserDTO savedUserDTO = UserMapper.toDTO(createUser);
                     return Optional.ofNullable(savedUserDTO); 
                 }
-                
+                @Override
+                public boolean deleteDummy(Long id){
+                    if (dummyUserRepository.existsById(id)) {
+                        dummyUserRepository.deleteById(id);
+                        return true;
+                    } else {
+                        return false; 
+                    }
+                }
 }

@@ -13,5 +13,6 @@ public interface RegistrationService {
            Optional<SecondStepDTO> secondStep(SecondStepDTO secondStepDTO);
            Optional<DummyUserDTO> findDummyUser(Long id);
            Optional<UserDTO> saveUser(UserDTO userDTO);
+           boolean deleteDummy(Long id);
            
 }

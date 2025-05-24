@@ -66,14 +66,26 @@ public class RegistrationController {
                             "status_code", 422
                     ));
                 }
-                UserDTO user = dummyUserDTO.map(DummyUserMapper::toUserDTO)
-                        .orElseThrow(() -> new IllegalStateException("User not found"));
-                return ResponseEntity.status(200).body(Map.of(
-                        "status", true,
-                        "message", "Login successful",
-                        "status_code", 200
-                        
-                ));
+                UserDTO user = dummyUserDTO.map(DummyUserMapper::toUserDTO).orElseThrow(() -> new IllegalStateException("User not found"));
+                user.setMobile(dto.getMobile());
+                Optional<UserDTO> saveUser = registrationServiceImpl.saveUser(user);
+                if (saveUser.isPresent() && saveUser.get().getId()> 0) {
+                        return ResponseEntity.status(201).body(Map.of(
+                                "status", true,
+                                "message", "Login successful",
+                                "status_code", 201,
+                                "saveUser",saveUser
+                                
+                        ));
+                }else{
+                        return ResponseEntity.status(400).body(Map.of(
+                                "status", true,
+                                "message", "registration failed",
+                                "status_code", 400
+                                
+                        ));
+                }
+             
 
         }
         

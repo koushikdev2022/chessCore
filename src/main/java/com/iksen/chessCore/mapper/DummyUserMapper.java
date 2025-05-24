@@ -31,7 +31,6 @@ public class DummyUserMapper {
     public static UserDTO toUserDTO(DummyUserDTO dto){
         if (dto == null) return null;
         UserDTO user = new UserDTO();
-        user.setId(dto.getId());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setUserName(dto.getUsername());
@@ -44,11 +43,14 @@ public class DummyUserMapper {
         user.setOAuth(dto.getOAuth());
         user.setOauthProvider(dto.getOauthProvider());
         user.setParentId(dto.getParentId());
+        user.setIsDeleted(0);
+        user.setStatus(0);
        
 
         return user;
 
     }
+    
     public static DummyUser toEntity(DummyUserDTO dto) {
         if (dto == null) return null;
 

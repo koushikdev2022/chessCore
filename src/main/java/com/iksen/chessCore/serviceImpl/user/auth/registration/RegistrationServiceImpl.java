@@ -12,7 +12,9 @@ import com.iksen.chessCore.dto.auth.registration.FirstStepUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
 import com.iksen.chessCore.dto.auth.registration.UserDTO;
 import com.iksen.chessCore.mapper.DummyUserMapper;
+import com.iksen.chessCore.mapper.UserMapper;
 import com.iksen.chessCore.model.DummyUser;
+import com.iksen.chessCore.model.User;
 import com.iksen.chessCore.repositary.DummyUserRepo;
 import com.iksen.chessCore.repositary.UserRepository;
 import com.iksen.chessCore.service.user.auth.registration.RegistrationService;
@@ -23,6 +25,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 private  PasswordEncoder passwordEncoder;
                 @Autowired
                 private DummyUserRepo dummyUserRepository;
+                @Autowired
+                private UserRepository userRepo;
 
                 // RegistrationServiceImpl(PasswordEncoder passwordEncoder) {
                 //     this.passwordEncoder = passwordEncoder;
@@ -54,7 +58,15 @@ public class RegistrationServiceImpl implements RegistrationService {
                     .map(DummyUserMapper::toDTO);
                 }
                 @Override
-                public Optional<UserDTO> SaveUser(UserDTO userDTO){
-                    return Optional.ofNullable(userDTO); 
+                public Optional<UserDTO> saveUser(UserDTO userDTO){
+                    if (userDTO.getId() != null && !userRepo.existsById(userDTO.getId())) {
+                        throw new RuntimeException("Trying to update a non-existent user");
+                    }
+                
+                    User user = UserMapper.toUser(userDTO);
+                    User createUser = userRepo.saveAndFlush(user);  // Flush to detect DB constraint issues early
+                    UserDTO savedUserDTO = UserMapper.toDTO(createUser);
+                    return Optional.ofNullable(savedUserDTO); 
                 }
+                
 }

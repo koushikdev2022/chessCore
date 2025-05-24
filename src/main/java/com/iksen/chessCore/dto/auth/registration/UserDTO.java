@@ -61,4 +61,9 @@ public class UserDTO {
 
     @JsonProperty("is_deleted")
     private Integer isDeleted = 0;
+
+    private LocalDateTime createdAt;
+
+    
+    private LocalDateTime updatedAt;
 }

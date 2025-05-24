@@ -1,5 +1,7 @@
 package com.iksen.chessCore.dto.auth.registration;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -13,6 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserDTO {
+
+    @JsonProperty("id")
+    private Long id;
 
     @JsonProperty("f_name")
     private String firstName;
@@ -40,6 +45,13 @@ public class UserDTO {
 
     @JsonProperty("oauth_provider")
     private String oauthProvider;
+
+    @JsonProperty("otp")
+    private Integer otp;
+
+    @JsonProperty("otp_expire")
+    private LocalDateTime otpExpire;
+    
 
     @JsonProperty("parent_id")
     private Long parentId = 0L;

@@ -21,6 +21,9 @@ import org.springframework.validation.BindingResult;
 
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
+import com.iksen.chessCore.dto.auth.registration.UserDTO;
+import com.iksen.chessCore.mapper.DummyUserMapper;
+import com.iksen.chessCore.model.User;
 
 @RestController()
 @RequestMapping("/api/auth")
@@ -56,14 +59,15 @@ public class RegistrationController {
         public ResponseEntity<?> registerSecondStep(@Valid @RequestBody SecondStepDTO dto){
     
                 Optional<DummyUserDTO> dummyUserDTO = registrationServiceImpl.findDummyUser(dto.getUser_id());
-                System.out.println("print User"+dummyUserDTO);
                 if (dummyUserDTO.isEmpty()) {
-                    return ResponseEntity.status(404).body(Map.of(
+                    return ResponseEntity.status(422).body(Map.of(
                             "status", false,
-                            "message", "User not found",
-                            "status_code", 404
+                            "message", "User details not found invalid user_id",
+                            "status_code", 422
                     ));
                 }
+                UserDTO user = dummyUserDTO.map(DummyUserMapper::toUserDTO)
+                        .orElseThrow(() -> new IllegalStateException("User not found"));
                 return ResponseEntity.status(200).body(Map.of(
                         "status", true,
                         "message", "Login successful",
@@ -72,4 +76,5 @@ public class RegistrationController {
                 ));
 
         }
+        
 }

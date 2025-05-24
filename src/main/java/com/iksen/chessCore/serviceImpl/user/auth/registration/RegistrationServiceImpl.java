@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.FirstStepUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
+import com.iksen.chessCore.dto.auth.registration.UserDTO;
 import com.iksen.chessCore.mapper.DummyUserMapper;
 import com.iksen.chessCore.model.DummyUser;
 import com.iksen.chessCore.repositary.DummyUserRepo;
@@ -51,5 +52,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 public Optional<DummyUserDTO> findDummyUser(Long id){
                     return dummyUserRepository.findById(id)
                     .map(DummyUserMapper::toDTO);
+                }
+                @Override
+                public Optional<UserDTO> SaveUser(UserDTO userDTO){
+                    return Optional.ofNullable(userDTO); 
                 }
 }

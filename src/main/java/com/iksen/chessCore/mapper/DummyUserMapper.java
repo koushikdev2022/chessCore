@@ -44,7 +44,7 @@ public class DummyUserMapper {
         user.setOauthProvider(dto.getOauthProvider());
         user.setParentId(dto.getParentId());
         user.setIsDeleted(0);
-        user.setStatus(0);
+        user.setStatus(1);
        
 
         return user;

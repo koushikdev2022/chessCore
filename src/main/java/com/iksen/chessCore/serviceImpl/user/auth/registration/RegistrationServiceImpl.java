@@ -77,4 +77,14 @@ public class RegistrationServiceImpl implements RegistrationService {
                         return false; 
                     }
                 }
+                @Override
+                public Optional<UserDTO> findEmail(String email){
+                    return userRepo.findByEmail(email)
+                    .map(UserMapper::toDTO);
+                }
+                @Override
+                public Optional<UserDTO> findUsername(String usernname){
+                    return userRepo.findByUserName(usernname)
+                    .map(UserMapper::toDTO);
+                }
 }

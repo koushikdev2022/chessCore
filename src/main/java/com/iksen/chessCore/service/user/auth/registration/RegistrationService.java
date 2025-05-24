@@ -14,5 +14,6 @@ public interface RegistrationService {
            Optional<DummyUserDTO> findDummyUser(Long id);
            Optional<UserDTO> saveUser(UserDTO userDTO);
            boolean deleteDummy(Long id);
-           
+           Optional<UserDTO> findEmail(String email);
+          Optional<UserDTO> findUsername(String usernname);
 }

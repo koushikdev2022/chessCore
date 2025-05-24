@@ -3,6 +3,7 @@ package com.iksen.chessCore.controller.api.user.registration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,30 +36,54 @@ public class RegistrationController {
             @Autowired
             private JwtUtill jwtUtill;
             @PostMapping("/first-step")
-            public ResponseEntity<?> registerStepOne(@Valid @RequestBody FirstStepUserDTO dto ,BindingResult bindingResult){
-            if (bindingResult.hasErrors()) {
-                Map<String, String> errors = new HashMap<>();
-                bindingResult.getFieldErrors().forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage())
-                );
-
-                return ResponseEntity.status(422).body(Map.of(
-                        "status", false,
-                        "message", "Validation failed",
-                        "status_code", 422,
-                        "errors", errors
+            public ResponseEntity<?> registerStepOne(@Valid @RequestBody FirstStepUserDTO dto, BindingResult bindingResult) {
+                // 1. Field validation errors
+                if (bindingResult.hasErrors()) {
+                    Map<String, String> errors = new HashMap<>();
+                    bindingResult.getFieldErrors().forEach(error ->
+                            errors.put(error.getField(), error.getDefaultMessage())
+                    );
+            
+                    return ResponseEntity.status(422).body(Map.of(
+                            "status", false,
+                            "message", "Validation failed",
+                            "status_code", 422,
+                            "errors", errors
+                    ));
+                }
+            
+                Map<String, String> validationErrors = new TreeMap<>();
+            
+                Optional<UserDTO> userByEmail = registrationServiceImpl.findEmail(dto.getEmail());
+                if (userByEmail.isPresent()) {
+                    validationErrors.put("email", "Email already exists");
+                }
+            
+                Optional<UserDTO> userByUsername = registrationServiceImpl.findUsername(dto.getUserName());
+                if (userByUsername.isPresent()) {
+                    validationErrors.put("username", "Username already exists");
+                }
+            
+                if (!validationErrors.isEmpty()) {
+                    return ResponseEntity.status(422).body(Map.of(
+                            "status", false,
+                            "message", "Validation failed",
+                            "status_code", 422,
+                            "errors", validationErrors
+                    ));
+                }
+            
+             
+                Optional<DummyUser> dummyUser = registrationServiceImpl.firstStep(dto);
+            
+                return ResponseEntity.status(200).body(Map.of(
+                        "status", true,
+                        "message", "First step completed successfully",
+                        "status_code", 200,
+                        "user", dummyUser
                 ));
             }
-            Optional<DummyUser> user = registrationServiceImpl.firstStep(dto);
-            return ResponseEntity.status(200).body(Map.of(
-                    "status", true,
-                    "message", "Login successful",
-                    "status_code", 200,
-                    "user", user
-            ));
-
-    
-        }
+            
         @PostMapping("/second-step")
         public ResponseEntity<?> registerSecondStep(@Valid @RequestBody SecondStepDTO dto){
     

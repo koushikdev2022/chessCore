@@ -6,7 +6,9 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.http.HttpSecurityBeanDefinitionParser.ChildAuthenticationManagerFactoryBean;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +21,11 @@ import com.iksen.chessCore.serviceImpl.user.auth.registration.UserAddressService
 import com.iksen.chessCore.utill.JwtUtill;
 
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 
 import org.springframework.validation.BindingResult;
 
+import com.iksen.chessCore.dto.auth.registration.ChildDTO;
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
 import com.iksen.chessCore.dto.auth.registration.UserDTO;
@@ -138,5 +142,6 @@ public class RegistrationController {
              
 
         }
+       
         
 }

@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.iksen.chessCore.dto.auth.registration.ChildDTO;
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.FirstStepUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
 import com.iksen.chessCore.dto.auth.registration.UserDTO;
+import com.iksen.chessCore.mapper.ChildMapper;
 import com.iksen.chessCore.mapper.DummyUserMapper;
 import com.iksen.chessCore.mapper.UserMapper;
 import com.iksen.chessCore.model.DummyUser;
@@ -86,5 +88,13 @@ public class RegistrationServiceImpl implements RegistrationService {
                 public Optional<UserDTO> findUsername(String usernname){
                     return userRepo.findByUserName(usernname)
                     .map(UserMapper::toDTO);
+                }
+                @Override
+                public ChildDTO saveDataChild(ChildDTO childDTO){
+                  User user = ChildMapper.fromChildDTOToUser(childDTO);
+                  user.setPassword(passwordEncoder.encode(user.getPassword()));
+                  User saveUser = userRepo.save(user);
+                  ChildDTO saveChildData = ChildMapper.fromUserToChildDTO(saveUser);
+                  return saveChildData;
                 }
 }

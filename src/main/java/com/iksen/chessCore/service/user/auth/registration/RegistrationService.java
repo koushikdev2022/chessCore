@@ -2,6 +2,7 @@ package com.iksen.chessCore.service.user.auth.registration;
 
 import java.util.Optional;
 
+import com.iksen.chessCore.dto.auth.registration.ChildDTO;
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.FirstStepUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
@@ -15,5 +16,6 @@ public interface RegistrationService {
            Optional<UserDTO> saveUser(UserDTO userDTO);
            boolean deleteDummy(Long id);
            Optional<UserDTO> findEmail(String email);
-          Optional<UserDTO> findUsername(String usernname);
+           Optional<UserDTO> findUsername(String usernname);
+           ChildDTO saveDataChild(ChildDTO childDTO);
 }

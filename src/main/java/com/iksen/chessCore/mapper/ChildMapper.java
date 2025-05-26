@@ -2,10 +2,14 @@ package com.iksen.chessCore.mapper;
 
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.iksen.chessCore.dto.auth.registration.ChildDTO;
 import com.iksen.chessCore.model.User;
 
 public class ChildMapper {
+          
             public static User fromChildDTOToUser(ChildDTO dto) {
                 if (dto == null) return null;
                 return User.builder()

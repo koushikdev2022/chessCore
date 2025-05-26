@@ -1,12 +1,16 @@
 package com.iksen.chessCore.service.user.auth.login;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.iksen.chessCore.config.CustomUserDetails;
 import com.iksen.chessCore.model.User;
 import com.iksen.chessCore.serviceImpl.user.auth.login.LoginServiceImpl;
 
@@ -23,30 +27,21 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (!userOptional.isPresent()) {
             throw new UsernameNotFoundException("User not found: " + username);
         }
-        
+
         User user = userOptional.get();
-        
-        // Check if user is active and not deleted
+
         if (user.getStatus() != 1 || user.getIsDeleted() != 0) {
             throw new UsernameNotFoundException("User account is inactive or deleted: " + username);
         }
-        
-        // Determine roles based on parentId
-        String[] roles;
-        if (user.getParentId() == 0L) {
-            roles = new String[]{"PARENT", "USER"};
-        } else {
-            roles = new String[]{"CHILD", "USER"};
-        }
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUserName())
-                .password(user.getPassword())
-                .roles(roles)
-                .accountExpired(false)
-                .accountLocked(user.getStatus() != 1)
-                .credentialsExpired(false)
-                .disabled(user.getIsDeleted() != 0)
-                .build();
+        String[] roles = user.getParentId() == 0L
+            ? new String[]{"PARENT", "USER"}
+            : new String[]{"CHILD", "USER"};
+
+        List<SimpleGrantedAuthority> authorities = Arrays.stream(roles)
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+
+        return new CustomUserDetails(user, authorities); // ✅ Pass authorities here
     }
 }

@@ -1,6 +1,8 @@
 package com.iksen.chessCore.utill;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,9 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iksen.chessCore.model.User;
-
 
 /**
  * Utility class for JWT token operations like generation, validation, and data extraction.
@@ -30,7 +30,7 @@ import com.iksen.chessCore.model.User;
 public class JwtUtill {
    
     private final String SECRET = "this_is_a_super_secure_secret_key_123!";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
     /**
      * Gets the signing key for JWT token generation and validation
@@ -65,13 +65,10 @@ public class JwtUtill {
             .setClaims(claims)
             .setSubject(user.getUserName())
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-            // .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 2))
+            .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
     }
-
-    
 
     /**
      * Extract all claims from token
@@ -125,7 +122,6 @@ public class JwtUtill {
             return !isTokenExpired(token);
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException | 
                 UnsupportedJwtException | IllegalArgumentException e) {
-            // Log the specific type of exception for better debugging
             System.out.println("JWT Validation Error: " + e.getMessage());
             return false;
         } catch (JwtException e) {
@@ -134,60 +130,123 @@ public class JwtUtill {
     }
 
     /**
-     * Extract user ID from token
+     * Extract user ID from token (FIXED VERSION)
      */
-    public String extractUserId(String token) {
+    public Long extractUserId(String token) {
         try {
             Claims claims = extractAllClaims(token);
-            Map<String, Object> userClaim = (Map<String, Object>) claims.get("user");
+            Object idClaim = claims.get("id");
             
-            if (userClaim == null) {
-                throw new RuntimeException("User claim not found in token");
+            if (idClaim == null) {
+                throw new RuntimeException("User ID not found in token");
             }
             
-            Map<String, Object> idObj = (Map<String, Object>) userClaim.get("id");
-            if (idObj == null) {
-                throw new RuntimeException("ID not found in user claim");
+            // Handle different types of ID representation
+            if (idClaim instanceof Long) {
+                return (Long) idClaim;
+            } else if (idClaim instanceof Integer) {
+                return ((Integer) idClaim).longValue();
+            } else if (idClaim instanceof String) {
+                return Long.parseLong((String) idClaim);
+            } else {
+                throw new RuntimeException("Unexpected ID type in token: " + idClaim.getClass());
             }
-            
-            return String.valueOf(idObj.get("timestamp"));
         } catch (Exception e) {
             System.out.println("Error extracting user ID from token: " + e.getMessage());
             throw new RuntimeException("Failed to extract user ID from token", e);
         }
     }
 
-    public Map<String, Object>  getUserData(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            Map<String, Object> userClaim = (Map<String, Object>) claims.get("user");
-            
-            if (userClaim == null) {
-                throw new RuntimeException("User claim not found in token");
-            }
-            return userClaim;
-        } catch (Exception e) {
-            System.out.println("Error extracting user ID from token: " + e.getMessage());
-            throw new RuntimeException("Failed to extract user ID from token", e);
-        }
-    }
-    
     /**
      * Extract user email from token
      */
     public String extractUserEmail(String token) {
-        Claims claims = extractAllClaims(token);
-        Map<String, Object> userClaim = (Map<String, Object>) claims.get("user");
-        return userClaim != null ? (String) userClaim.get("email") : null;
+        try {
+            Claims claims = extractAllClaims(token);
+            return (String) claims.get("email");
+        } catch (Exception e) {
+            System.out.println("Error extracting email from token: " + e.getMessage());
+            return null;
+        }
     }
-    
+
     /**
-     * Get the complete user object from token
+     * Extract user first name from token
      */
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> extractUser(String token) {
-        Claims claims = extractAllClaims(token);
-        return (Map<String, Object>) claims.get("user");
+    public String extractFirstName(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return (String) claims.get("firstName");
+        } catch (Exception e) {
+            System.out.println("Error extracting first name from token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Extract user last name from token
+     */
+    public String extractLastName(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return (String) claims.get("lastName");
+        } catch (Exception e) {
+            System.out.println("Error extracting last name from token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Extract parent ID from token
+     */
+    public Long extractParentId(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            Object parentIdClaim = claims.get("parentId");
+            
+            if (parentIdClaim == null) {
+                return null;
+            }
+            
+            if (parentIdClaim instanceof Long) {
+                return (Long) parentIdClaim;
+            } else if (parentIdClaim instanceof Integer) {
+                return ((Integer) parentIdClaim).longValue();
+            } else if (parentIdClaim instanceof String) {
+                return Long.parseLong((String) parentIdClaim);
+            }
+            
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error extracting parent ID from token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get all user data from token as a map
+     */
+    public Map<String, Object> getUserData(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            Map<String, Object> userData = new HashMap<>();
+            
+            userData.put("id", claims.get("id"));
+            userData.put("firstName", claims.get("firstName"));
+            userData.put("lastName", claims.get("lastName"));
+            userData.put("username", claims.get("username"));
+            userData.put("email", claims.get("email"));
+            userData.put("mobile", claims.get("mobile"));
+            userData.put("avatar", claims.get("avatar"));
+            userData.put("parentId", claims.get("parentId"));
+            userData.put("status", claims.get("status"));
+            userData.put("isDeleted", claims.get("isDeleted"));
+            
+            return userData;
+        } catch (Exception e) {
+            System.out.println("Error extracting user data from token: " + e.getMessage());
+            throw new RuntimeException("Failed to extract user data from token", e);
+        }
     }
     
     /**
@@ -205,6 +264,134 @@ public class JwtUtill {
             return null;
         }
     }
+
+    /**
+     * Get current HTTP request from RequestContextHolder
+     */
+    private HttpServletRequest getCurrentRequest() {
+        try {
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            return attrs.getRequest();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not get current HTTP request: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get current JWT token from the request
+     */
+    public String getCurrentToken() {
+        try {
+            HttpServletRequest request = getCurrentRequest();
+            return extractToken(request);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not extract JWT token from current request: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get current user ID directly from JWT token in the request
+     */
+    public Long getCurrentUserId() {
+        String token = getCurrentToken();
+        if (token == null) {
+            throw new RuntimeException("JWT token not found in request headers");
+        }
+        return extractUserId(token);
+    }
+
+    /**
+     * Get current username directly from JWT token in the request
+     */
+    public String getCurrentUsername() {
+        String token = getCurrentToken();
+        if (token == null) {
+            throw new RuntimeException("JWT token not found in request headers");
+        }
+        return extractUsername(token);
+    }
+
+    /**
+     * Get current email directly from JWT token in the request
+     */
+    public String getCurrentEmail() {
+        String token = getCurrentToken();
+        if (token == null) {
+            throw new RuntimeException("JWT token not found in request headers");
+        }
+        return extractUserEmail(token);
+    }
+
+    /**
+     * Get current user's full name
+     */
+    public String getCurrentFullName() {
+        String token = getCurrentToken();
+        if (token == null) {
+            throw new RuntimeException("JWT token not found in request headers");
+        }
+        String firstName = extractFirstName(token);
+        String lastName = extractLastName(token);
+        return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+    }
+
+    /**
+     * Get current user's parent ID
+     */
+    public Long getCurrentParentId() {
+        String token = getCurrentToken();
+        if (token == null) {
+            throw new RuntimeException("JWT token not found in request headers");
+        }
+        return extractParentId(token);
+    }
+
+    /**
+     * Get all current user data
+     */
+    public Map<String, Object> getCurrentUserData() {
+        String token = getCurrentToken();
+        if (token == null) {
+            throw new RuntimeException("JWT token not found in request headers");
+        }
+        return getUserData(token);
+    }
+
+    /**
+     * Check if current user is authenticated (has valid JWT token)
+     */
+    public boolean isAuthenticated() {
+        try {
+            String token = getCurrentToken();
+            return token != null && validateToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if current user is a parent (parentId == 0)
+     */
+    public boolean isCurrentUserParent() {
+        try {
+            Long parentId = getCurrentParentId();
+            return parentId != null && parentId == 0L;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if current user is a child (parentId != 0)
+     */
+    public boolean isCurrentUserChild() {
+        try {
+            Long parentId = getCurrentParentId();
+            return parentId != null && parentId != 0L;
+        } catch (Exception e) {
+            return false;
+        }
+    }
     
     /**
      * Generate a token with custom claims
@@ -220,7 +407,7 @@ public class JwtUtill {
     }
     
     /**
-     * Refresh an existing token by creating a new one with same subject
+     * Refresh an existing token by creating a new one with same claims
      */
     public String refreshToken(String token) {
         if (!validateToken(token)) {
@@ -228,11 +415,11 @@ public class JwtUtill {
         }
         
         String username = extractUsername(token);
-        Map<String, Object> userMap = extractUser(token);
+        Map<String, Object> userData = getUserData(token);
         
         return Jwts.builder()
+                .setClaims(userData)
                 .setSubject(username)
-                .claim("user", userMap)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

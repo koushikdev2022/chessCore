@@ -75,6 +75,14 @@ public class UserAddress {
         updatedAt = LocalDateTime.now();
     }
 
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    // private User user;
+
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId; // <-- Add this
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;

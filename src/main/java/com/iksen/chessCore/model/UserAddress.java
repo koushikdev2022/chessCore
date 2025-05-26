@@ -53,7 +53,7 @@ public class UserAddress {
     @Column(name = "lat")
     private String lat;
 
-    @Column(name = "long")
+    @Column(name = "longitude")
     private String longitude;
 
     @Column(name = "status")

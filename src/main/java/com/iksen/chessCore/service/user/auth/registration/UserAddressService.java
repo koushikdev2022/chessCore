@@ -7,5 +7,5 @@ import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
 import com.iksen.chessCore.dto.auth.userAddress.UserAddressDTO;
 
 public interface UserAddressService {
-    Optional<UserAddressDTO> saveAddress(SecondStepDTO secondStepDTO);
+    UserAddressDTO saveAddress(SecondStepDTO secondStepDTO);
 }

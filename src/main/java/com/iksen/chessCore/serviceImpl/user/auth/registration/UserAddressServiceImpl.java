@@ -3,6 +3,7 @@ package com.iksen.chessCore.serviceImpl.user.auth.registration;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
 import com.iksen.chessCore.dto.auth.registration.UserDTO;
@@ -14,16 +15,17 @@ import com.iksen.chessCore.repositary.UserAddressRepo;
 import com.iksen.chessCore.repositary.UserRepository;
 import com.iksen.chessCore.service.user.auth.registration.UserAddressService;
 
+@Service
 public class UserAddressServiceImpl implements UserAddressService{
             @Autowired
             private  UserAddressRepo userAddressRepo;
             @Override
-            public Optional<UserAddressDTO> saveAddress(SecondStepDTO secondStepDTO){
+            public UserAddressDTO saveAddress(SecondStepDTO secondStepDTO){
                 UserAddressDTO userAddressDTO = new UserAddressDTO();
                 UserAddressDTO convertUserAddressDTO = UserAddressMapper.toSecondToAddressDTO(secondStepDTO);
                 UserAddress userAddress = UserAddressMapper.toUserAddress(convertUserAddressDTO);
                 UserAddress savedUserAddressDTO = userAddressRepo.save(userAddress);
                 UserAddressDTO convertUserAddressDTO2 = UserAddressMapper.toDTO(savedUserAddressDTO);
-                return Optional.of(convertUserAddressDTO2);
+                return convertUserAddressDTO2;
             }
 }

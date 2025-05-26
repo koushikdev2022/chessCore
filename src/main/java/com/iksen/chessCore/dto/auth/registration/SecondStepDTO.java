@@ -66,7 +66,7 @@ public class SecondStepDTO {
     @JsonProperty("lat")
     private String lat;
 
-    @JsonProperty("long")
+    @JsonProperty("longitude")
     private String longitude;
 
     @Builder.Default

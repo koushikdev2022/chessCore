@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iksen.chessCore.dto.auth.registration.FirstStepUserDTO;
 import com.iksen.chessCore.model.DummyUser;
 import com.iksen.chessCore.serviceImpl.user.auth.registration.RegistrationServiceImpl;
+import com.iksen.chessCore.serviceImpl.user.auth.registration.UserAddressServiceImpl;
 import com.iksen.chessCore.utill.JwtUtill;
 
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ import org.springframework.validation.BindingResult;
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.SecondStepDTO;
 import com.iksen.chessCore.dto.auth.registration.UserDTO;
+import com.iksen.chessCore.dto.auth.userAddress.UserAddressDTO;
 import com.iksen.chessCore.mapper.DummyUserMapper;
 import com.iksen.chessCore.mapper.UserMapper;
 import com.iksen.chessCore.model.User;
@@ -31,6 +33,8 @@ import com.iksen.chessCore.model.User;
 @RestController()
 @RequestMapping("/api/auth")
 public class RegistrationController {
+        @Autowired
+        private UserAddressServiceImpl userAddressServiceImpl;
         @Autowired
         private RegistrationServiceImpl registrationServiceImpl;
         @Autowired
@@ -104,11 +108,13 @@ public class RegistrationController {
                         if(data){
                                 User saveUserD = saveUser.map(UserMapper::toUser).orElseThrow(() -> new IllegalStateException("User not found"));
                                 String token = jwtUtill.generateToken(saveUserD);
+                                UserAddressDTO userAddressDTO = userAddressServiceImpl.saveAddress(dto);
                                 return ResponseEntity.status(201).body(Map.of(
                                         "status", true,
                                         "message", "Login successful",
                                         "status_code", 201,
                                         "user",saveUser,
+                                        "userAddressDTO",userAddressDTO,
                                         "token",token
                                         
                                 ));

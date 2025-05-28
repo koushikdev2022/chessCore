@@ -14,7 +14,7 @@ import com.iksen.chessCore.castomeAnnotation.PasswordMatches;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@PasswordMatches // <- Custom class-level validation annotation
+@PasswordMatches 
 public class FirstStepUserDTO {
 
     @JsonProperty("username")

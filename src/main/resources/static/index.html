@@ -1,756 +1,281 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lichess Demo - Enhanced</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
-        input { padding: 8px; margin: 5px; }
-        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
-        pre { background: #f5f5f5; padding: 10px; overflow: auto; }
-        .error { color: red; }
-        .success { color: green; }
-    </style>
+  <title>Lichess Demo - Enhanced with Chessboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+    input, select { padding: 8px; margin: 5px; }
+    button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+    pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+    .error { color: red; }
+    .success { color: green; }
+    #chessboard { width: 400px; height: 400px; margin-top: 10px; }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/chessground@8.2.4/assets/chessground.base.css" />
 </head>
 <body>
-    <h1>Lichess API Debug Tool</h1>
-    
-    <div class="section">
-        <h2>1. Check Account Info</h2>
-        <button onclick="getAccount()">Get My Account Info</button>
-        <pre id="accountResponse"></pre>
-    </div>
+  <h1>Lichess API Debug Tool with Chessboard</h1>
 
-    <div class="section">
-        <h2>2. Validate User</h2>
-        <input type="text" id="checkUsername" placeholder="Enter username to check" />
-        <button onclick="checkUser()">Check User Exists</button>
-        <pre id="userCheckResponse"></pre>
-    </div>
+  <div class="section">
+    <h2>Live Chess Board</h2>
+    <div id="chessboard"></div>
+    <button onclick="resetBoard()">Reset Board</button>
+  </div>
 
-    <div class="section">
-        <h2>3. Challenge User</h2>
-        <input type="text" id="challengeUsername" placeholder="Enter Lichess username" />
-        <button onclick="challenge()">Challenge User</button>
-        <pre id="challengeResponse"></pre>
-    </div>
+  <div class="section">
+    <h2>1. Check Account Info</h2>
+    <button onclick="getAccount()">Get My Account Info</button>
+    <pre id="accountResponse"></pre>
+  </div>
 
-    <div class="section">
-        <h2>4. Play with Bot</h2>
-        <select id="botList">
-            <option value="maia1">maia1 (easy)</option>
-            <option value="maia5">maia5 (medium)</option>
-            <option value="maia9">maia9 (hard)</option>
-        </select>
-        <button onclick="playWithBot()">Challenge Selected Bot</button>
-        <pre id="botChallengeResponse"></pre>
-    </div>
+  <div class="section">
+    <h2>2. Validate User</h2>
+    <input type="text" id="checkUsername" placeholder="Enter username to check" />
+    <button onclick="checkUser()">Check User Exists</button>
+    <pre id="userCheckResponse"></pre>
+  </div>
 
-    <div class="section">
-        <h2>Test Different Users:</h2>
-        <ul>
-            <li><button onclick="setUsername('lichess')">lichess</button></li>
-            <li><button onclick="setUsername('maia1')">maia1 (bot)</button></li>
-            <li><button onclick="setUsername('koushikjourneymondal')">koushikjourneymondal (yourself)</button></li>
-        </ul>
-        <p><strong>Note:</strong> You cannot challenge yourself. A 404 error for 'koushikjourneymondal' is expected.</p>
-    </div>
+  <div class="section">
+    <h2>3. Challenge User</h2>
+    <input type="text" id="challengeUsername" placeholder="Enter Lichess username" />
+    <button onclick="challenge()">Challenge User</button>
+    <pre id="challengeResponse"></pre>
+  </div>
 
-    <div class="section">
-        <h2>Self-Challenge Detection</h2>
-        <button onclick="checkSelfChallenge()">Check if trying to challenge self</button>
-        <pre id="selfChallengeCheck"></pre>
-    </div>
+  <div class="section">
+    <h2>4. Play with Bot</h2>
+    <select id="botList">
+      <option value="maia1">maia1 (easy)</option>
+      <option value="maia5">maia5 (medium)</option>
+      <option value="maia9">maia9 (hard)</option>
+    </select>
+    <button onclick="playWithBot()">Challenge Selected Bot</button>
+    <pre id="botChallengeResponse"></pre>
+  </div>
 
-<script>
+  <div class="section">
+    <h2>Test Different Users:</h2>
+    <ul>
+      <li><button onclick="setUsername('lichess')">lichess</button></li>
+      <li><button onclick="setUsername('maia1')">maia1 (bot)</button></li>
+      <li><button onclick="setUsername('koushikjourneymondal')">koushikjourneymondal (yourself)</button></li>
+    </ul>
+    <p><strong>Note:</strong> You cannot challenge yourself. A 404 error for 'koushikjourneymondal' is expected.</p>
+  </div>
+
+  <div class="section">
+    <h2>Self-Challenge Detection</h2>
+    <button onclick="checkSelfChallenge()">Check if trying to challenge self</button>
+    <pre id="selfChallengeCheck"></pre>
+  </div>
+
+  <script src="https://unpkg.com/chessground@8.2.4/chessground.min.js"></script>
+  <script src="https://unpkg.com/chess.js@latest/chess.js"></script>
+  <script>
+    let ground, chess;
+
+    // Initialize chessground and chess.js
+    function initChessBoard() {
+      chess = new Chess();
+      ground = Chessground(document.getElementById('chessboard'), {
+        coordinates: true,
+        draggable: {
+          enabled: true,
+          showGhost: true
+        },
+        movable: {
+          free: false,
+          color: 'both',
+          dests: getDests(),
+          events: {
+            after: move => {
+              chess.move({ from: move.from, to: move.to, promotion: 'q' });
+              ground.set({
+                fen: chess.fen(),
+                movable: { dests: getDests() }
+              });
+            }
+          }
+        },
+        highlight: {
+          lastMove: true,
+          check: true
+        }
+      });
+    }
+
+    function getDests() {
+      const dests = new Map();
+      chess.SQUARES.forEach(s => {
+        const moves = chess.moves({ square: s, verbose: true });
+        if (moves.length)
+          dests.set(s, moves.map(m => m.to));
+      });
+      return dests;
+    }
+
+    function resetBoard() {
+      chess.reset();
+      ground.set({
+        fen: chess.fen(),
+        turnColor: 'white',
+        movable: {
+          color: 'both',
+          dests: getDests()
+        }
+      });
+    }
+
+    window.onload = initChessBoard;
+
+    // API actions below
     function getAccount() {
-        fetch('/api/lichess/account')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('accountResponse').textContent = data;
-        })
-        .catch(error => {
-            document.getElementById('accountResponse').textContent = "Error: " + error;
-        });
+      fetch('/api/lichess/account')
+      .then(res => res.text())
+      .then(data => document.getElementById('accountResponse').textContent = data)
+      .catch(err => document.getElementById('accountResponse').textContent = "Error: " + err);
     }
 
     function checkUser() {
-        const username = document.getElementById('checkUsername').value.trim();
-        if (!username) {
-            document.getElementById('userCheckResponse').textContent = "Please enter a username";
-            return;
-        }
-
-        fetch(`/api/lichess/user/${username}`)
-        .then(response => {
-            if (response.ok) {
-                return response.text();
-            } else {
-                throw new Error(`HTTP ${response.status}: User not found or not accessible`);
-            }
-        })
-        .then(data => {
-            document.getElementById('userCheckResponse').textContent = data;
-            document.getElementById('userCheckResponse').className = 'success';
-        })
-        .catch(error => {
-            document.getElementById('userCheckResponse').textContent = "Error: " + error.message;
-            document.getElementById('userCheckResponse').className = 'error';
-        });
+      const username = document.getElementById('checkUsername').value.trim();
+      if (!username) {
+        document.getElementById('userCheckResponse').textContent = "Please enter a username";
+        return;
+      }
+      fetch(`/api/lichess/user/${username}`)
+      .then(res => res.ok ? res.text() : Promise.reject(`HTTP ${res.status}`))
+      .then(data => {
+        document.getElementById('userCheckResponse').textContent = data;
+        document.getElementById('userCheckResponse').className = 'success';
+      })
+      .catch(err => {
+        document.getElementById('userCheckResponse').textContent = "Error: " + err;
+        document.getElementById('userCheckResponse').className = 'error';
+      });
     }
 
     function challenge() {
-        const username = document.getElementById('challengeUsername').value.trim();
-        if (!username) {
-            document.getElementById('challengeResponse').textContent = "Please enter a username";
-            return;
-        }
+      const username = document.getElementById('challengeUsername').value.trim();
+      if (!username) {
+        document.getElementById('challengeResponse').textContent = "Please enter a username";
+        return;
+      }
 
-        fetch(`/api/lichess/challenge/${username}`, {
-            method: "POST"
-        })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('challengeResponse').textContent = data;
-
-            try {
-                const parsed = JSON.parse(data);
-                if (parsed.url) {
-                    document.getElementById('challengeResponse').className = 'success';
-                    window.open(parsed.url, '_blank');
-                } else if (parsed.error) {
-                    document.getElementById('challengeResponse').className = 'error';
-                }
-            } catch (e) {
-                document.getElementById('challengeResponse').className = 'error';
-            }
-        })
-        .catch(error => {
-            document.getElementById('challengeResponse').textContent = "Error: " + error;
+      fetch(`/api/lichess/challenge/${username}`, { method: "POST" })
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('challengeResponse').textContent = data;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.url) {
+            document.getElementById('challengeResponse').className = 'success';
+            window.open(parsed.url, '_blank');
+          } else if (parsed.error) {
             document.getElementById('challengeResponse').className = 'error';
-        });
+          }
+        } catch { document.getElementById('challengeResponse').className = 'error'; }
+      })
+      .catch(err => {
+        document.getElementById('challengeResponse').textContent = "Error: " + err;
+        document.getElementById('challengeResponse').className = 'error';
+      });
     }
 
     function playWithBot() {
-        const bot = document.getElementById('botList').value;
-
-        fetch(`/api/lichess/challenge/${bot}`, {
-            method: "POST"
-        })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('botChallengeResponse').textContent = data;
-
-            try {
-                const parsed = JSON.parse(data);
-                if (parsed.url) {
-                    document.getElementById('botChallengeResponse').className = 'success';
-                    window.open(parsed.url, '_blank');
-                } else if (parsed.error) {
-                    document.getElementById('botChallengeResponse').className = 'error';
-                }
-            } catch (e) {
-                document.getElementById('botChallengeResponse').className = 'error';
-            }
-        })
-        .catch(error => {
-            document.getElementById('botChallengeResponse').textContent = "Error: " + error;
+      const bot = document.getElementById('botList').value;
+      fetch(`/api/lichess/challenge/${bot}`, { method: "POST" })
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('botChallengeResponse').textContent = data;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.url) {
+            document.getElementById('botChallengeResponse').className = 'success';
+            window.open(parsed.url, '_blank');
+          } else if (parsed.error) {
             document.getElementById('botChallengeResponse').className = 'error';
-        });
+          }
+        } catch { document.getElementById('botChallengeResponse').className = 'error'; }
+      })
+      .catch(err => {
+        document.getElementById('botChallengeResponse').textContent = "Error: " + err;
+        document.getElementById('botChallengeResponse').className = 'error';
+      });
     }
 
     function setUsername(username) {
-        document.getElementById('checkUsername').value = username;
-        document.getElementById('challengeUsername').value = username;
+      document.getElementById('checkUsername').value = username;
+      document.getElementById('challengeUsername').value = username;
     }
 
     function checkSelfChallenge() {
-        fetch('/api/lichess/account')
-        .then(response => response.text())
-        .then(data => {
-            try {
-                const account = JSON.parse(data);
-                const currentUsername = account.username;
-                const challengeUsername = document.getElementById('challengeUsername').value.trim();
-                
-                if (currentUsername === challengeUsername) {
-                    document.getElementById('selfChallengeCheck').textContent = 
-                        `WARNING: You are trying to challenge yourself! Current user: ${currentUsername}, Challenge target: ${challengeUsername}.`;
-                    document.getElementById('selfChallengeCheck').className = 'error';
-                } else {
-                    document.getElementById('selfChallengeCheck').textContent = 
-                        `OK: Current user: ${currentUsername}, Challenge target: ${challengeUsername}. This should work.`;
-                    document.getElementById('selfChallengeCheck').className = 'success';
-                }
-            } catch (e) {
-                document.getElementById('selfChallengeCheck').textContent = 'Could not parse account info: ' + e.message;
-            }
-        })
-        .catch(error => {
-            document.getElementById('selfChallengeCheck').textContent = 'Error getting account info: ' + error;
-        });
+      fetch('/api/lichess/account')
+      .then(res => res.text())
+      .then(data => {
+        try {
+          const account = JSON.parse(data);
+          const currentUsername = account.username;
+          const challengeUsername = document.getElementById('challengeUsername').value.trim();
+          if (currentUsername === challengeUsername) {
+            document.getElementById('selfChallengeCheck').textContent = `WARNING: You are trying to challenge yourself! (${currentUsername})`;
+            document.getElementById('selfChallengeCheck').className = 'error';
+          } else {
+            document.getElementById('selfChallengeCheck').textContent = `OK: Challenging ${challengeUsername} from ${currentUsername}`;
+            document.getElementById('selfChallengeCheck').className = 'success';
+          }
+        } catch (e) {
+          document.getElementById('selfChallengeCheck').textContent = 'Parse error: ' + e.message;
+        }
+      })
+      .catch(err => {
+        document.getElementById('selfChallengeCheck').textContent = 'Error: ' + err;
+      });
     }
-</script>
+     function listenToGameSocket(gameId) {
+    const token = 'lip_1HLSr1Rv5vuSuqRbPgqz'; // Inject dynamically or use server proxy
+
+    const socket = new WebSocket(`wss://socket.lichess.org/api/stream/game/${gameId}?bearer=${token}`);
+
+    socket.onopen = () => {
+      console.log('WebSocket connected for game:', gameId);
+    };
+
+    socket.onmessage = event => {
+      const data = event.data;
+      console.log('Game Update:', data);
+
+      // Optionally update the board
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.type === 'gameFull' || parsed.type === 'gameState') {
+          // parsed.state.moves = e2e4 e7e5 ... (space-separated)
+          const moves = parsed.state?.moves?.split(' ') || [];
+          resetBoard();
+          for (const move of moves) {
+            chess.move({ from: move.substring(0, 2), to: move.substring(2, 4), promotion: 'q' });
+          }
+          ground.set({
+            fen: chess.fen(),
+            movable: { dests: getDests() }
+          });
+        }
+      } catch (err) {
+        console.warn('WebSocket JSON parse failed:', err);
+      }
+    };
+
+    socket.onerror = error => {
+      console.error('WebSocket error:', error);
+    };
+
+    socket.onclose = () => {
+      console.warn('WebSocket closed for game:', gameId);
+    };
+  }
+  </script>
+
+ 
+
 </body>
 </html>
-
-
-
-
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Chess Board - Lichess Integration</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            background: #232946;
-            color: #eaeaea;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-        .game-container {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-        .board-container, .info-panel {
-            background: #2a2d3e;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            padding: 24px;
-        }
-        .board-container {
-            flex: 1 1 350px;
-            min-width: 320px;
-            max-width: 600px;
-        }
-        .info-panel {
-            flex: 1 1 350px;
-            min-width: 320px;
-        }
-        .chess-board {
-            width: 100%;
-            aspect-ratio: 1;
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 3px solid #4c566a;
-            margin-bottom: 12px;
-        }
-        .square {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(28px, 4vw, 48px);
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .square.light { background: #f0d9b5; color: #333; }
-        .square.dark { background: #b58863; color: #333; }
-        .square.selected { background: #ffe066 !important; }
-        .square:hover { transform: scale(1.03); }
-        .coordinates {
-            display: flex;
-            justify-content: space-between;
-            margin: 4px 0;
-            font-size: 14px;
-            color: #8fa1b3;
-        }
-        .rank-labels {
-            position: absolute;
-            left: -22px;
-            top: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #8fa1b3;
-        }
-        .challenge-section, .game-info, .controls, .move-history {
-            margin-bottom: 20px;
-            background: #232946;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        input, button {
-            padding: 10px 14px;
-            margin: 4px 0;
-            border: none;
-            border-radius: 4px;
-            background: #393e5c;
-            color: white;
-            font-size: 15px;
-        }
-        input { background: #22243a; }
-        button:hover { background: #4f5d75; }
-        .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .status.success { background: #a3be8c; color: #232946; }
-        .status.error { background: #bf616a; }
-        .status.info { background: #5e81ac; }
-        .move-input {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin: 8px 0;
-        }
-        h1, h2, h3 { color: #eaeaea; margin-top: 0; }
-        .turn-indicator {
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 14px;
-            background: #393e5c;
-            border-radius: 6px;
-            padding: 10px;
-        }
-        .white-turn { border-left: 5px solid #f0f0f0; }
-        .black-turn { border-left: 5px solid #333; }
-        .move-history {
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 15px;
-        }
-        @media (max-width: 900px) {
-            .game-container { flex-direction: column; }
-            .board-container, .info-panel { max-width: 100%; }
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>♟️ Chess Board - Lichess Integration</h1>
-    <div class="game-container">
-        <div class="board-container">
-            <div class="turn-indicator" id="turnIndicator">Select or start a game</div>
-            <div style="position: relative;">
-                <div class="rank-labels">
-                    <div>8</div><div>7</div><div>6</div><div>5</div>
-                    <div>4</div><div>3</div><div>2</div><div>1</div>
-                </div>
-                <div class="chess-board" id="chessBoard"></div>
-                <div class="coordinates">
-                    <span>a</span><span>b</span><span>c</span><span>d</span>
-                    <span>e</span><span>f</span><span>g</span><span>h</span>
-                </div>
-            </div>
-        </div>
-        <div class="info-panel">
-            <div class="challenge-section">
-                <h3>🎯 Challenge a User</h3>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="challengeUsername" placeholder="Enter Lichess username" style="flex: 1;">
-                    <button onclick="challengeUser()" title="Send a challenge">Challenge</button>
-                </div>
-                <div style="margin: 10px 0;">
-                    <button onclick="setUsername('lichess')" title="Challenge Lichess Bot">Challenge Lichess</button>
-                    <button onclick="setUsername('maia1')" title="Challenge Maia Bot">Challenge Maia Bot</button>
-                </div>
-                <div id="challengeStatus"></div>
-            </div>
-            <div class="game-info">
-                <h3>🎮 Game Information</h3>
-                <div id="gameStatus">No active game</div>
-                <div id="playerInfo"></div>
-                <div id="gameDetails"></div>
-            </div>
-            <div class="controls">
-                <h3>⚡ Game Controls</h3>
-                <div class="move-input">
-                    <input type="text" id="gameIdInput" placeholder="Game ID" style="flex: 1;">
-                    <button onclick="loadGame()" title="Load game by ID">Load Game</button>
-                </div>
-                <div class="move-input">
-                    <input type="text" id="moveInput" placeholder="Move (e.g., e2e4)" maxlength="5">
-                    <button onclick="makeMove()" title="Make move">Make Move</button>
-                </div>
-                <div>
-                    <button onclick="getCurrentGames()" title="Get your current games">Get My Games</button>
-                    <button onclick="refreshBoard()" title="Refresh board">Refresh Board</button>
-                    <button onclick="resetBoard()" title="Reset to starting position">Reset Board</button>
-                </div>
-                <div id="moveStatus"></div>
-            </div>
-            <div class="move-history">
-                <h3>📝 Move History</h3>
-                <div id="moveHistory">No moves yet</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-// Game state
-let currentGame = null;
-let selectedSquare = null;
-let gameBoard = null;
-let isWhiteToMove = true;
-let moveHistory = [];
-
-// Chess pieces in Unicode
-const pieces = {
-    'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-    'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
-};
-
-// Initial chess position (FEN)
-const initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
-// Initialize board
-function initializeBoard() {
-    const board = document.getElementById('chessBoard');
-    board.innerHTML = '';
-    
-    // Create 64 squares
-    for (let rank = 8; rank >= 1; rank--) {
-        for (let file = 0; file < 8; file++) {
-            const square = document.createElement('div');
-            const fileChar = String.fromCharCode(97 + file); // a-h
-            const squareName = fileChar + rank;
-            
-            square.className = 'square ' + ((rank + file) % 2 === 0 ? 'dark' : 'light');
-            square.id = squareName;
-            square.onclick = () => handleSquareClick(squareName);
-            
-            board.appendChild(square);
-        }
-    }
-    
-    // Set up initial position
-    setupInitialPosition();
-}
-
-function setupInitialPosition() {
-    // Parse FEN and set up pieces
-    const fen = initialPosition.split(' ')[0];
-    const ranks = fen.split('/');
-    
-    gameBoard = {};
-    
-    for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
-        const rank = 8 - rankIndex;
-        const rankData = ranks[rankIndex];
-        let file = 0;
-        
-        for (let char of rankData) {
-            if (isNaN(char)) {
-                // It's a piece
-                const fileChar = String.fromCharCode(97 + file);
-                const squareName = fileChar + rank;
-                gameBoard[squareName] = char;
-                file++;
-            } else {
-                // It's a number (empty squares)
-                file += parseInt(char);
-            }
-        }
-    }
-    
-    updateBoardDisplay();
-}
-
-function updateBoardDisplay() {
-    // Clear all squares
-    document.querySelectorAll('.square').forEach(square => {
-        square.textContent = '';
-        square.classList.remove('selected', 'possible-move', 'last-move');
-    });
-    
-    // Place pieces
-    for (let square in gameBoard) {
-        const element = document.getElementById(square);
-        if (element && pieces[gameBoard[square]]) {
-            element.textContent = pieces[gameBoard[square]];
-        }
-    }
-    
-    updateTurnIndicator();
-}
-
-function updateTurnIndicator() {
-    const indicator = document.getElementById('turnIndicator');
-    if (currentGame) {
-        indicator.textContent = `${isWhiteToMove ? 'White' : 'Black'} to move`;
-        indicator.className = 'turn-indicator ' + (isWhiteToMove ? 'white-turn' : 'black-turn');
-    } else {
-        indicator.textContent = 'Select or start a game';
-        indicator.className = 'turn-indicator';
-    }
-}
-
-function handleSquareClick(squareName) {
-    if (!currentGame) {
-        showStatus('No active game', 'error');
-        return;
-    }
-    
-    if (selectedSquare === squareName) {
-        // Deselect
-        selectedSquare = null;
-        updateBoardDisplay();
-        return;
-    }
-    
-    if (selectedSquare) {
-        // Try to make a move
-        const move = selectedSquare + squareName;
-        document.getElementById('moveInput').value = move;
-        makeMove();
-        selectedSquare = null;
-    } else {
-        // Select square if it has a piece
-        if (gameBoard[squareName]) {
-            selectedSquare = squareName;
-            document.getElementById(squareName).classList.add('selected');
-        }
-    }
-}
-
-// Challenge user
-function challengeUser() {
-    const username = document.getElementById('challengeUsername').value.trim();
-    if (!username) {
-        showStatus('Please enter a username', 'error', 'challengeStatus');
-        return;
-    }
-    
-    showStatus('Challenging user...', 'info', 'challengeStatus');
-    
-    fetch(`/api/lichess/challenge/${username}`, {
-        method: 'POST'
-    })
-    .then(response => response.text())
-    .then(data => {
-        try {
-            const result = JSON.parse(data);
-            if (result.error) {
-                showStatus(`Challenge failed: ${result.error}`, 'error', 'challengeStatus');
-            } else {
-                showStatus('Challenge sent successfully!', 'success', 'challengeStatus');
-                
-                // Auto-load the game
-                if (result.id) {
-                    document.getElementById('gameIdInput').value = result.id;
-                    currentGame = result;
-                    updateGameInfo(result);
-                    loadGame();
-                    
-                    // Add to move history
-                    addToMoveHistory(`Game started: ${result.id}`);
-                    addToMoveHistory(`Players: ${result.challenger?.name || 'You'} vs ${result.destUser?.name || username}`);
-                    addToMoveHistory(`Time control: ${result.timeControl?.show || 'Unknown'}`);
-                }
-            }
-        } catch (e) {
-            showStatus('Challenge response: ' + data, 'info', 'challengeStatus');
-        }
-    })
-    .catch(error => {
-        showStatus('Error: ' + error, 'error', 'challengeStatus');
-    });
-}
-
-function setUsername(username) {
-    document.getElementById('challengeUsername').value = username;
-}
-
-// Load game
-function loadGame() {
-    const gameId = document.getElementById('gameIdInput').value.trim();
-    if (!gameId) {
-        showStatus('Please enter a game ID', 'error');
-        return;
-    }
-    
-    currentGame = { id: gameId };
-    document.getElementById('chessBoard').classList.add('game-active');
-    showStatus(`Loaded game: ${gameId}`, 'success');
-    updateGameInfo({ id: gameId, status: 'loaded' });
-    
-    // Reset to initial position for now
-    setupInitialPosition();
-}
-
-// Make move
-function makeMove() {
-    const move = document.getElementById('moveInput').value.trim();
-    const gameId = currentGame?.id || document.getElementById('gameIdInput').value.trim();
-    
-    if (!gameId) {
-        showStatus('No active game', 'error', 'moveStatus');
-        return;
-    }
-    
-    if (!move) {
-        showStatus('Please enter a move', 'error', 'moveStatus');
-        return;
-    }
-    
-    showStatus('Making move...', 'info', 'moveStatus');
-    
-    fetch(`/api/lichess/move?gameId=${gameId}&move=${move}`, {
-        method: 'POST'
-    })
-    .then(response => response.text())
-    .then(data => {
-        try {
-            const result = JSON.parse(data);
-            if (result.error) {
-                showStatus(`Move failed: ${result.error}`, 'error', 'moveStatus');
-            } else {
-                showStatus('Move made successfully!', 'success', 'moveStatus');
-                addToMoveHistory(`Move: ${move}`);
-                
-                // Clear move input
-                document.getElementById('moveInput').value = '';
-                
-                // Toggle turn
-                isWhiteToMove = !isWhiteToMove;
-                updateTurnIndicator();
-                
-                // Simple move visualization (basic)
-                if (move.length >= 4) {
-                    const from = move.substring(0, 2);
-                    const to = move.substring(2, 4);
-                    
-                    // Move piece visually
-                    if (gameBoard[from]) {
-                        gameBoard[to] = gameBoard[from];
-                        delete gameBoard[from];
-                        updateBoardDisplay();
-                        
-                        // Highlight last move
-                        document.getElementById(from).classList.add('last-move');
-                        document.getElementById(to).classList.add('last-move');
-                    }
-                }
-            }
-        } catch (e) {
-            showStatus('Move response: ' + data, 'info', 'moveStatus');
-        }
-    })
-    .catch(error => {
-        showStatus('Error: ' + error, 'error', 'moveStatus');
-    });
-}
-
-// Get current games
-function getCurrentGames() {
-    fetch('/api/lichess/games')
-    .then(response => response.text())
-    .then(data => {
-        try {
-            const games = JSON.parse(data);
-            if (games.nowPlaying && games.nowPlaying.length > 0) {
-                const game = games.nowPlaying[0];
-                document.getElementById('gameIdInput').value = game.gameId;
-                currentGame = game;
-                updateGameInfo(game);
-                addToMoveHistory(`Found active game: ${game.gameId}`);
-            } else {
-                showStatus('No active games found', 'info');
-            }
-        } catch (e) {
-            showStatus('Games response: ' + data, 'info');
-        }
-    })
-    .catch(error => {
-        showStatus('Error getting games: ' + error, 'error');
-    });
-}
-
-// Refresh board
-function refreshBoard() {
-    updateBoardDisplay();
-    showStatus('Board refreshed', 'info');
-}
-
-// Update game info display
-function updateGameInfo(game) {
-    const gameStatus = document.getElementById('gameStatus');
-    const playerInfo = document.getElementById('playerInfo');
-    const gameDetails = document.getElementById('gameDetails');
-    
-    if (game) {
-        gameStatus.textContent = `Status: ${game.status || 'Active'}`;
-        
-        if (game.challenger && game.destUser) {
-            playerInfo.innerHTML = `
-                <strong>Players:</strong><br>
-                ${game.challenger.name} (${game.challenger.rating}) vs 
-                ${game.destUser.name} (${game.destUser.rating})
-            `;
-        }
-        
-        if (game.timeControl) {
-            gameDetails.innerHTML = `
-                <strong>Game ID:</strong> ${game.id}<br>
-                <strong>Time Control:</strong> ${game.timeControl.show || 'N/A'}<br>
-                <strong>Variant:</strong> ${game.variant?.name || 'Standard'}<br>
-                <strong>Rated:</strong> ${game.rated ? 'Yes' : 'No'}
-            `;
-        }
-    }
-}
-
-// Show status message
-function showStatus(message, type, elementId = 'moveStatus') {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.textContent = message;
-        element.className = 'status ' + type;
-        
-        // Auto-clear after 5 seconds for non-error messages
-        if (type !== 'error') {
-            setTimeout(() => {
-                element.textContent = '';
-                element.className = '';
-            }, 5000);
-        }
-    }
-}
-
-// Add to move history
-function addToMoveHistory(moveText) {
-    moveHistory.push(moveText);
-    const historyElement = document.getElementById('moveHistory');
-    historyElement.innerHTML = moveHistory.map(move => `<div>${move}</div>`).join('');
-    historyElement.scrollTop = historyElement.scrollHeight;
-}
-
-// Handle enter key in inputs
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('challengeUsername').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') challengeUser();
-    });
-    
-    document.getElementById('gameIdInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') loadGame();
-    });
-    
-    document.getElementById('moveInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') makeMove();
-    });
-    
-    // Initialize the board
-    initializeBoard();
-});
-</script>
-</body>
-</html> -->

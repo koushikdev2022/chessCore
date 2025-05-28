@@ -61,4 +61,8 @@ public class LichessController {
             @RequestParam String move) {
         return ResponseEntity.ok(lichessServiceImpl.makeMove(gameId, move));
     }
+    @GetMapping("/stream/{gameId}")
+    public ResponseEntity<String> streamGame(@PathVariable String gameId) {
+        return ResponseEntity.ok(lichessServiceImpl.streamGame(gameId));
+    }
 }

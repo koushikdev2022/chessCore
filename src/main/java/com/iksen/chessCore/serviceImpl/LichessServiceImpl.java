@@ -6,6 +6,12 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +19,16 @@ import org.slf4j.LoggerFactory;
 public class LichessServiceImpl implements LichessService {
 
     private static final Logger logger = LoggerFactory.getLogger(LichessServiceImpl.class);
-    
+    @Value("${lichess.api.token}")
+    private String lichessToken;
     // private final String token = "lip_aGGHiDZE87C6xzJXrjLZ";
     private final String token = "lip_Oa51L7HfGltlc8igeipc";
     private final String baseUrl = "https://lichess.org/api";
-
+    private HttpHeaders headers;
+    private RestTemplate restTemplate;
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
+        headers.setBearerAuth(lichessToken);
         headers.set("Accept", "application/json");
         return headers;
     }
@@ -86,7 +94,7 @@ public class LichessServiceImpl implements LichessService {
             
             String url = "https://lichess.org/api/challenge/" + username;
             HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(token);
+            headers.setBearerAuth(lichessToken);
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.set("Accept", "application/json");
 
@@ -142,6 +150,27 @@ public class LichessServiceImpl implements LichessService {
         } catch (Exception e) {
             logger.error("Unexpected error on GET {}: {}", url, e.getMessage());
             throw e;
+        }
+    }
+
+     @Override
+    public String streamGame(String gameId) {
+        try {
+            URL url = new URL("https://lichess.org/api/board/game/stream/" + gameId);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Authorization", "Bearer " + lichessToken);
+            connection.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder streamOutput = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                streamOutput.append(line).append("\n");
+            }
+            reader.close();
+            return streamOutput.toString();
+        } catch (Exception e) {
+            return "Error streaming game: " + e.getMessage();
         }
     }
 }

@@ -8,4 +8,6 @@ public interface LichessService {
     String challengeUser(String username);
 
     String makeMove(String gameId, String move);
+
+    String streamGame(String gameId);
 }

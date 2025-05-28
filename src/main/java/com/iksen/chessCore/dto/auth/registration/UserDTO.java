@@ -52,14 +52,16 @@ public class UserDTO {
     @JsonProperty("otp_expire")
     private LocalDateTime otpExpire;
     
-
+    @Builder.Default
     @JsonProperty("parent_id")
     private Long parentId = 0L;
 
+    @Builder.Default
     @JsonProperty("status")
     private Integer status = 1;
 
     @JsonProperty("is_deleted")
+    @Builder.Default
     private Integer isDeleted = 0;
 
     private LocalDateTime createdAt;

@@ -14,8 +14,8 @@ public class LichessServiceImpl implements LichessService {
 
     private static final Logger logger = LoggerFactory.getLogger(LichessServiceImpl.class);
     
-    private final String token = "lip_aGGHiDZE87C6xzJXrjLZ";
-    // private final String token = "lip_UQ98IARrzjJXGXCduVAn";
+    // private final String token = "lip_aGGHiDZE87C6xzJXrjLZ";
+    private final String token = "lip_Oa51L7HfGltlc8igeipc";
     private final String baseUrl = "https://lichess.org/api";
 
     private HttpHeaders getHeaders() {

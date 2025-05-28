@@ -19,15 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iksen.chessCore.dto.auth.profile.AvatarDTO;
+import com.iksen.chessCore.serviceImpl.user.auth.profile.ProfileServiceImpl;
 import com.iksen.chessCore.utill.JwtUtill;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/profile")
-public class profileController {
+public class ProfileController{
             @Autowired
             private JwtUtill jwtUtill;
+            @Autowired
+            private ProfileServiceImpl profileServiceImpl;
             @PostMapping("/avatar")
             public ResponseEntity<?> avatar(@Valid 
                     @RequestParam("avatar") MultipartFile avatarFile) {
@@ -43,7 +46,7 @@ public class profileController {
                     }
                     try {
                         String projectRoot = new File("").getAbsolutePath(); 
-                        String userUploadDirPath = projectRoot + "/public/upload/" + userId + "/";
+                        String userUploadDirPath = projectRoot + "/public/uploads/avatar/" + userId + "/";
                         File userUploadDir = new File(userUploadDirPath);
                         if (!userUploadDir.exists()) {
                             userUploadDir.mkdirs();
@@ -59,15 +62,25 @@ public class profileController {
                         AvatarDTO avatarDTO= new AvatarDTO();
                         String filePath = userUploadDirPath + newFileName;
                         avatarFile.transferTo(new File(filePath));
-                        avatarDTO.setAvatar("/public/upload/" + userId + "/" + newFileName); 
-                        
-                        // Character seconadAddCharacter = characterServiceImpl.imageAddCharacter(id,characterDto);
-                        return ResponseEntity.status(201).body(Map.of(
-                            "status", true,
-                            "message", "character insert successfully",
-                            "status_code", 200
-                            
-                        ));
+                        avatarDTO.setAvatar("/public/uploads/avatar/" + userId + "/" + newFileName); 
+                        avatarDTO.setId(userId);
+                        boolean saveData = profileServiceImpl.avataUpload(avatarDTO); 
+                        if(saveData){
+                                return ResponseEntity.status(200).body(Map.of(
+                                    "status", true,
+                                    "message", "avatar upload successfully",
+                                    "status_code", 200
+                                    
+                                ));
+                        }else{
+                              return ResponseEntity.status(201).body(Map.of(
+                                    "status", true,
+                                    "message", "character insert successfully",
+                                    "status_code", 200
+                                    
+                                ));
+                        }
+                  
                     } catch (IOException e) {
                            return ResponseEntity.ok(Map.of(
                                 "status", false,

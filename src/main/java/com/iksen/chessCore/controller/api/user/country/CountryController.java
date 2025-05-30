@@ -25,14 +25,14 @@ public class CountryController {
                         List<CountryDTO> country = countryServiceImpl.list();
                         if(!country.isEmpty()){
                               return ResponseEntity.ok(Map.of(
-                                "status", false,
+                                "status", true,
                                 "message", "country found",
-                                "status_code", 400,
+                                "status_code", 200,
                                 "country",country
                               ));
                         }else{
                               return ResponseEntity.ok(Map.of(
-                                        "status", false,
+                                        "status", true,
                                         "message", "no country",
                                         "status_code", 200
                                ));

@@ -39,9 +39,10 @@ public class CountryController {
                         }
                       
                 } catch (Exception e) {
-                            return ResponseEntity.status(400).body(Map.of(
+                             return ResponseEntity.status(400).body(Map.of(
                                     "status", false,
-                                    "message", "failed to upload",
+                                    "message", "something went wrong",
+                                    "error",e,
                                     "status_code", 400
                             ));
                 }

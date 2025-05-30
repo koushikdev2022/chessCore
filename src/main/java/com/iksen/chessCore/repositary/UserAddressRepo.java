@@ -8,4 +8,6 @@ import com.iksen.chessCore.model.UserAddress;
 
 public interface UserAddressRepo extends JpaRepository<UserAddress, Long> {
     List<UserAddress> findByUserId(Long id);
+    List<UserAddress> findByUserIdAndIdNot(Long userId,Long id);
+    
 }

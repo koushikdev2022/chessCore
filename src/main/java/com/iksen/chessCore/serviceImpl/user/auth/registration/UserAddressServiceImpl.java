@@ -1,5 +1,6 @@
 package com.iksen.chessCore.serviceImpl.user.auth.registration;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +46,28 @@ public class UserAddressServiceImpl implements UserAddressService{
                   UserAddressDTO userAddressDtoSaveData = UserAddressMapper.toDTO(saveDataAddress);
                 
                   return userAddressDtoSaveData;
+            }
+            @Override
+            public boolean primaryUpdate(Long id){
+                  Optional<UserAddress> userAddress = userAddressRepo.findById(id);
+                  // List<UserAddress> list = userAddress.map(Collections::singletonList)
+                  //                .orElse(Collections.emptyList());
+                  userAddress.ifPresent(address -> {
+                        address.setIsPrimary(1);           
+                        userAddressRepo.save(address);      
+                  });
+                  
+                  if(userAddress.isPresent()){
+                    
+                        Long user_id = userAddress.get().getUserId();
+                        List<UserAddress> userAddressList = userAddressRepo.findByUserIdAndIdNot(user_id,id);
+                        for (UserAddress address : userAddressList) {
+                                address.setIsPrimary(0); 
+                        }
+
+                        userAddressRepo.saveAll(userAddressList);
+                  }
+                  
+                  return true;
             }
 }

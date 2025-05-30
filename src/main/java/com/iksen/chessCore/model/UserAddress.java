@@ -56,8 +56,13 @@ public class UserAddress {
     @Column(name = "longitude")
     private String longitude;
 
+    @Builder.Default
     @Column(name = "status")
     private Integer status = 1;
+
+    @Builder.Default
+    @Column(name = "is_primary")
+    private Integer isPrimary = 1;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

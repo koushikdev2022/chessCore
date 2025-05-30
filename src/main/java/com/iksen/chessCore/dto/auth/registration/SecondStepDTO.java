@@ -73,4 +73,8 @@ public class SecondStepDTO {
     @JsonProperty("status")
     private Integer status = 1;
 
+    @Builder.Default
+    @JsonProperty("is_primary")
+    private Integer isPrimary = 1;
+
 }

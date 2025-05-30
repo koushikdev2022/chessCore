@@ -22,6 +22,7 @@ public class UserAddressMapper {
                       .lat(user.getLat())
                       .longitude(user.getLongitude())
                       .status(user.getStatus())
+                      .isPrimary(user.getIsPrimary())
                       .build();
           }
             public static UserAddress toUserAddress(UserAddressDTO user) {
@@ -41,6 +42,7 @@ public class UserAddressMapper {
                       .lat(user.getLat())
                       .longitude(user.getLongitude())
                       .status(user.getStatus())
+                      .isPrimary(user.getIsPrimary())
                       .build();
           }
           public static UserAddressDTO toDTO(UserAddress address) {
@@ -61,6 +63,7 @@ public class UserAddressMapper {
                       .lat(address.getLat())
                       .longitude(address.getLongitude())
                       .status(address.getStatus())
+                      .isPrimary(address.getIsPrimary())
                       .createdAt(address.getCreatedAt())
                       .updatedAt(address.getUpdatedAt())
                       .build();

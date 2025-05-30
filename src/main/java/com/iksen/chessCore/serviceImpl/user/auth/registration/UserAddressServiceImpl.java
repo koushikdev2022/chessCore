@@ -1,5 +1,6 @@
 package com.iksen.chessCore.serviceImpl.user.auth.registration;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import com.iksen.chessCore.dto.auth.registration.UserDTO;
 import com.iksen.chessCore.dto.auth.userAddress.UserAddressDTO;
 import com.iksen.chessCore.mapper.UserAddressMapper;
 import com.iksen.chessCore.mapper.UserMapper;
+import com.iksen.chessCore.model.User;
 import com.iksen.chessCore.model.UserAddress;
 import com.iksen.chessCore.repositary.UserAddressRepo;
 import com.iksen.chessCore.repositary.UserRepository;
@@ -27,5 +29,21 @@ public class UserAddressServiceImpl implements UserAddressService{
                 UserAddress savedUserAddressDTO = userAddressRepo.save(userAddress);
                 UserAddressDTO convertUserAddressDTO2 = UserAddressMapper.toDTO(savedUserAddressDTO);
                 return convertUserAddressDTO2;
+            }
+            @Override
+            public UserAddressDTO saveAddressToData(UserAddressDTO userAddressDTO){
+                  List<UserAddress> userAddress = userAddressRepo.findByUserId(userAddressDTO.getUserId());
+                  if(!userAddress.isEmpty()){
+                        for (UserAddress address : userAddress) {
+                                address.setIsPrimary(0); 
+                        }
+
+                        userAddressRepo.saveAll(userAddress);
+                  }
+                  UserAddress userAddressEntity = UserAddressMapper.toUserAddress(userAddressDTO);
+                  UserAddress saveDataAddress =  userAddressRepo.save(userAddressEntity);
+                  UserAddressDTO userAddressDtoSaveData = UserAddressMapper.toDTO(saveDataAddress);
+                
+                  return userAddressDtoSaveData;
             }
 }

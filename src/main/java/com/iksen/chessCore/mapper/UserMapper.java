@@ -1,5 +1,9 @@
 package com.iksen.chessCore.mapper;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.iksen.chessCore.dto.auth.registration.DummyUserDTO;
 import com.iksen.chessCore.dto.auth.registration.UserDTO;
 import com.iksen.chessCore.model.DummyUser;
@@ -29,6 +33,7 @@ public class UserMapper {
                 .updatedAt(user.getUpdatedAt())
                 .build();
     }
+
     public static User toUser(UserDTO user) {
         if (user == null) return null;
 

@@ -35,7 +35,7 @@ public class ProfileController{
             public ResponseEntity<?> avatar(@Valid 
                     @RequestParam("avatar") MultipartFile avatarFile) {
                 try {
-                    
+                     
                     Long userId = jwtUtill.getCurrentUserId();
                     if (avatarFile.isEmpty()) {
                          return ResponseEntity.ok(Map.of(

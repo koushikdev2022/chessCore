@@ -54,12 +54,7 @@ public class UserAddressController {
                                         "status_code", 400
                                 ));
                                 
-                        // } catch (DataIntegrityViolationException e) {
-                        //         return ResponseEntity.status(409).body(Map.of(
-                        //                 "status", false,
-                        //                 // "message", "Child already exists or data conflict",
-                        //                 "status_code", 409
-                        //         ));
+                 
                                 
                         } catch (Exception e) {
                                 return ResponseEntity.status(400).body(Map.of(
@@ -96,12 +91,7 @@ public class UserAddressController {
                                         "status_code", 400
                                 ));
                                 
-                        // } catch (DataIntegrityViolationException e) {
-                        //         return ResponseEntity.status(409).body(Map.of(
-                        //                 "status", false,
-                        //                 // "message", "Child already exists or data conflict",
-                        //                 "status_code", 409
-                        //         ));
+              
                                 
                         } catch (Exception e) {
                                 return ResponseEntity.status(400).body(Map.of(

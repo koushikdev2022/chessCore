@@ -112,6 +112,7 @@ public class RegistrationController {
                         if(data){
                                 User saveUserD = saveUser.map(UserMapper::toUser).orElseThrow(() -> new IllegalStateException("User not found"));
                                 String token = jwtUtill.generateToken(saveUserD);
+                                dto.setUser_id(saveUser.get().getId());
                                 UserAddressDTO userAddressDTO = userAddressServiceImpl.saveAddress(dto);
                                 return ResponseEntity.status(201).body(Map.of(
                                         "status", true,

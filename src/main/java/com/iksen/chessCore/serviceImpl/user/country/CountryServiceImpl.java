@@ -17,7 +17,7 @@ public class CountryServiceImpl implements CountryService{
                 private CountryRepo countryRepo;
                 @Override
                 public List<CountryDTO> list(){
-                    List<Country> country = countryRepo.findByStatus(1);
+                    List<Country> country = countryRepo.findByStatusOrderByCountryNameAsc(1);
                     List<CountryDTO> coun = CountryMapper.toDTOList(country);
                     return coun;
                 }

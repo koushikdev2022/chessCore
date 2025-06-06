@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StateRepo extends JpaRepository<State, Long>{
     
-    List<State> findByCountryIdAndStatus(Long countryId,int id);
+    List<State> findByCountryIdAndStatusOrderByStateNameAsc(Long countryId,int id);
 }

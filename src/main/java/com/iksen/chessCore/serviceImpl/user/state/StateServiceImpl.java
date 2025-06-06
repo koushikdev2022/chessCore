@@ -18,7 +18,7 @@ public class StateServiceImpl implements StateService{
         private StateRepo stateRepo;
         @Override
         public List<StateDTO> state(Long countryId){
-            List<State> states = stateRepo.findByCountryIdAndStatus(countryId, 1);
+            List<State> states = stateRepo.findByCountryIdAndStatusOrderByStateNameAsc(countryId, 1);
             List<StateDTO> stateData =  StateMapper.toDTOList(states);
             return stateData;
         }

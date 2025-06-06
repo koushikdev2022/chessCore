@@ -108,7 +108,7 @@ public class RegistrationController {
                 Optional<UserDTO> saveUser = registrationServiceImpl.saveUser(user);
                 saveUser.ifPresent(u -> u.setPassword(null));
                 if (saveUser.isPresent() && saveUser.get().getId()> 0) {
-                        boolean data = registrationServiceImpl.deleteDummy(dto.getUser_id());
+                         boolean data = registrationServiceImpl.deleteDummy(dto.getUser_id());
                         if(data){
                                 User saveUserD = saveUser.map(UserMapper::toUser).orElseThrow(() -> new IllegalStateException("User not found"));
                                 String token = jwtUtill.generateToken(saveUserD);

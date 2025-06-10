@@ -40,7 +40,7 @@ public class SpringSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/health-check/**","/api/auth/**","/api/lichess/**", "/public/**","/index.html","/api/country/**","/api/state/**").permitAll()
+                .requestMatchers("/health-check/**","/api/auth/**","/api/lichess/**", "/public/**","/index.html","/api/country/**","/api/state/**","/api/plan/**").permitAll()
                 // .requestMatchers("/admin/**").hasRole("ADMIN")
                 // .requestMatchers("/user/**").hasRole("USER")
                 // .requestMatchers("/manager/**").hasRole("MANAGER")

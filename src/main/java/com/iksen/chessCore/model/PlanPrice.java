@@ -4,16 +4,19 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "plan_prices")
+@Table(name = "plan_details")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "plan")
 public class PlanPrice {
 
     @Id
@@ -26,8 +29,10 @@ public class PlanPrice {
     @Column(length = 255)
     private String price;
 
+  
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id")
+    @JsonBackReference("plan-prices") // Matches Plan's @JsonManagedReference
     private Plan plan;
 
     @Column(name = "country_id")

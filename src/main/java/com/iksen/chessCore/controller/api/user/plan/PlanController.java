@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.iksen.chessCore.dto.country.CountryDTO;
+import com.iksen.chessCore.dto.plan.PlanDTO;
+import com.iksen.chessCore.serviceImpl.plan.PlanServiceImpl;
 import com.iksen.chessCore.serviceImpl.user.country.CountryServiceImpl;
 
 import jakarta.validation.ValidationException;
@@ -22,14 +24,30 @@ import jakarta.validation.ValidationException;
 @RequestMapping("/api/plan")
 public class PlanController {
        @Autowired
-        private CountryServiceImpl countryServiceImpl;
+       private CountryServiceImpl countryServiceImpl;
+       @Autowired
+       private PlanServiceImpl planServiceImpl; 
        @GetMapping("/list/{ip}")
        public ResponseEntity<?> allPlan(@PathVariable("ip") String ip  ){
             try{
+                    if(ip.isBlank()){
+                         return ResponseEntity.status(422).body(Map.of(
+                                "status", false,
+                                "message", "ip can not be blank",
+                                "status_code", 422
+                        ));
+                    };
                     RestTemplate restTemplate = new RestTemplate();
                     String url = "https://ipwho.is/" + ip;
 
                     Map response = restTemplate.getForObject(url, Map.class);
+                    if (response == null || !(Boolean) response.get("success")) {
+                        return ResponseEntity.status(400).body(Map.of(
+                                "status", false,
+                                "message", "Invalid IP or failed to fetch location.",
+                                "status_code", 400
+                        ));
+                    }
                     String countryName = (String) response.get("country");
 
                     List<CountryDTO> countryData = countryServiceImpl.findCountryName(countryName);
@@ -40,19 +58,12 @@ public class PlanController {
                     }else{
                          id = countryData.get(0).getId();
                     }
-                    
-
-                    if (response == null || !(Boolean) response.get("success")) {
-                        return ResponseEntity.status(400).body(Map.of(
-                                "status", false,
-                                "message", "Invalid IP or failed to fetch location.",
-                                "status_code", 400
-                        ));
-                    }
+                    List<PlanDTO> plan = planServiceImpl.findAllPlan(id);
+                    System.out.println(plan+"plan");
 
                     return ResponseEntity.ok(Map.of(
                             "status", true,
-                            "data", response.get("country"),
+                            "data", plan,
                             "status_code", 200
                     ));
             } catch (Exception e) {

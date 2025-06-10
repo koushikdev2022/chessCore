@@ -4,17 +4,21 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "plan_accesses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "planMappings")
 public class PlanAccess {
 
     @Id
@@ -39,6 +43,8 @@ public class PlanAccess {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "access", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PlanAccessMap> planMappings;
+    // Keep LAZY and initialize collection
+    @OneToMany(mappedBy = "access", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference("access-mappings")
+    private List<PlanAccessMap> planMappings = new ArrayList<>();
 }

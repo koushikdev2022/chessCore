@@ -10,8 +10,6 @@ import com.iksen.chessCore.model.Plan;
 
 public interface PlanRepository extends JpaRepository<Plan, Integer> {
 
-    @EntityGraph(attributePaths = {"prices"})
-    @Override
-    List<Plan> findAll(); // Override default findAll
+   
 
 }

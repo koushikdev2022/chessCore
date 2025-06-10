@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 @Entity
-@Table(name = "plan_accesses")
+@Table(name = "plan_access")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,7 +44,7 @@ public class PlanAccess {
     private LocalDateTime updatedAt;
 
     // Keep LAZY and initialize collection
-    @OneToMany(mappedBy = "access", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonManagedReference("access-mappings")
+    @OneToMany(mappedBy = "access", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // @JsonManagedReference("access-mappings")
     private List<PlanAccessMap> planMappings = new ArrayList<>();
 }

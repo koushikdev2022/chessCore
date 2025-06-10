@@ -53,10 +53,10 @@ public class Plan {
 
     
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference("plan-prices")
+    // @JsonManagedReference("plan-prices")
     private List<PlanPrice> prices = new ArrayList<>();
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference("plan-accessmaps")
+    // @JsonManagedReference("plan-accessmaps")
     private List<PlanAccessMap> accessMappings;
 }

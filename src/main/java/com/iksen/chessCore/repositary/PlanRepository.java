@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.iksen.chessCore.model.Plan;
 
 public interface PlanRepository extends JpaRepository<Plan, Integer> {
-
+        
        List<Plan> findByStatus(int Status);
 
 }

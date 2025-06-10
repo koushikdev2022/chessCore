@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.SQLRestriction;
+
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = "plan")
+@SQLRestriction("status = 1")
 public class PlanPrice {
 
     @Id
@@ -33,6 +37,7 @@ public class PlanPrice {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id")
     @JsonBackReference("plan-prices") // Matches Plan's @JsonManagedReference
+    
     private Plan plan;
 
     @Column(name = "country_id")

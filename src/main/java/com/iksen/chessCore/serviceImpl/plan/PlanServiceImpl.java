@@ -19,8 +19,7 @@ public class PlanServiceImpl implements PlanService{
         private PlanRepository planRepository;
         @Override
         public List<PlanDTO>  findAllPlan(int id){
-            List<Plan> plan = planRepository.findAll();
-            System.out.println(plan+"planplanplanplanplan");
+            List<Plan> plan = planRepository.findByStatus(1);
             List<PlanDTO> pln = PlanMapper.toDTOList(plan);
             return pln;
         }

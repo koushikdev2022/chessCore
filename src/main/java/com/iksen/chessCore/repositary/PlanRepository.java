@@ -10,6 +10,6 @@ import com.iksen.chessCore.model.Plan;
 
 public interface PlanRepository extends JpaRepository<Plan, Integer> {
 
-   
+       List<Plan> findByStatus(int Status);
 
 }

@@ -21,4 +21,10 @@ public class CountryServiceImpl implements CountryService{
                     List<CountryDTO> coun = CountryMapper.toDTOList(country);
                     return coun;
                 }
+                @Override
+                public List<CountryDTO> findCountryName(String countryName){
+                    List<Country> country =  countryRepo.findFirstByStatusAndCountryNameStartingWith(1, countryName);
+                    List<CountryDTO> coun = CountryMapper.toDTOList(country);
+                    return coun;
+                }
 }

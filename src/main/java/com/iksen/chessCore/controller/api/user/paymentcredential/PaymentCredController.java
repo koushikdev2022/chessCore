@@ -35,6 +35,6 @@ public class PaymentCredController {
                                 "status_code", 400,
                                 "error",e
                              ));
-                    }
             }
+        }
 }

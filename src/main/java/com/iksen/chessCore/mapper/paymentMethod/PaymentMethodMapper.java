@@ -1,18 +1,26 @@
 package com.iksen.chessCore.mapper.paymentMethod;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.iksen.chessCore.dto.paymentMethod.PaymentMethodDTO;
 import com.iksen.chessCore.model.PaymentMethod;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
 public class PaymentMethodMapper {
 
-    public static PaymentMethodDTO toDTO(PaymentMethod paymentMethod) {
+    @Value("${app.admin-url}")
+    private String adminUrl;  // ✅ NOT static
+
+    public PaymentMethodDTO toDTO(PaymentMethod paymentMethod) {
         return new PaymentMethodDTO(
                 paymentMethod.getId(),
                 paymentMethod.getName(),
                 paymentMethod.getShortName(),
+                paymentMethod.getAvatar() != null ? adminUrl + paymentMethod.getAvatar() : null,
                 paymentMethod.getStatus(),
                 paymentMethod.getCreatedAt(),
                 paymentMethod.getUpdatedAt(),
@@ -23,9 +31,9 @@ public class PaymentMethodMapper {
         );
     }
 
-    public static List<PaymentMethodDTO> toDTOList(List<PaymentMethod> paymentMethods) {
+    public List<PaymentMethodDTO> toDTOList(List<PaymentMethod> paymentMethods) {
         return paymentMethods.stream()
-                .map(PaymentMethodMapper::toDTO)
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 }

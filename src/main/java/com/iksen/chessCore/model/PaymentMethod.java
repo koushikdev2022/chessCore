@@ -29,6 +29,9 @@ public class PaymentMethod {
     @Column(name = "short_name", length = 255)
     private String shortName;
 
+    @Column(name = "avatar", length = 255)
+    private String avatar;
+
     @Column(columnDefinition = "int(11) default 1")
     private Integer status = 1;
 

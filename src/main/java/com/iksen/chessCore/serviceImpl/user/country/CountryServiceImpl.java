@@ -23,7 +23,7 @@ public class CountryServiceImpl implements CountryService{
                 }
                 @Override
                 public List<CountryDTO> findCountryName(String countryName){
-                    List<Country> country =  countryRepo.findFirstByStatusAndCountryNameStartingWith(1, countryName);
+                    List<Country> country =  countryRepo.findByStatusAndCountryName(1, countryName);
                     List<CountryDTO> coun = CountryMapper.toDTOList(country);
                     return coun;
                 }

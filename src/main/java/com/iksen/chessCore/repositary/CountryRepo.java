@@ -9,6 +9,6 @@ import com.iksen.chessCore.model.Country;
 
 public interface CountryRepo extends JpaRepository<Country, Long>{
      List<Country>findByStatusOrderByCountryNameAsc(int id);
-     List<Country> findFirstByStatusAndCountryNameStartingWith(int id, String countryNamePrefix);
+     List<Country> findByStatusAndCountryName(int id, String countryNamePrefix);
     
 }

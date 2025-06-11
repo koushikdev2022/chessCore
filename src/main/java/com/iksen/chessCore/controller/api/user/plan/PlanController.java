@@ -58,12 +58,14 @@ public class PlanController {
                     }else{
                          id = countryData.get(0).getId();
                     }
+                     System.out.println(id+"plancountry");
                     List<PlanDTO> plan = planServiceImpl.findAllPlan(id);
                     System.out.println(plan+"plan");
 
                     return ResponseEntity.ok(Map.of(
                             "status", true,
                             "data", plan,
+                            "response.get(\"country\")",response.get("country"),
                             "status_code", 200
                     ));
             } catch (Exception e) {

@@ -4,46 +4,35 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.SQLRestriction;
-
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "plan_details")
+@Table(name = "plan_keys")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "plan")
-@SQLRestriction("status = 1")
-public class PlanPrice {
+public class PlanKey {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255, name = "currency")
-    private String currency;
+    @Column(name = "plan_price_key", length = 255)
+    private String planPriceKey;
 
-    @Column(length = 255, name = "price")
-    private String price;
+    @Column(name = "plan_extrakey_key", length = 255)
+    private String planExtrakeyKey;
 
-  
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id")
-    @JsonBackReference("plan-prices") // Matches Plan's @JsonManagedReference
-    
-    private Plan plan;
+    @Column(name = "plan_details_id")
+    private Long planDetailsId;
 
-    @Column(name = "country_id")
-    private Long countryId;
+    @Column(name = "payment_id")
+    private Long paymentId;
 
-    @Column(nullable = true)
+    @Column(columnDefinition = "int(11) default 1")
     private Integer status = 1;
 
     @CreationTimestamp

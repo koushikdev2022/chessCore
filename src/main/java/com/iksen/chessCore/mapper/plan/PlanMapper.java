@@ -37,8 +37,8 @@ public class PlanMapper {
         }
         return new PlanPriceDTO(
                 price.getId(),
-                price.getPrice(),
                 price.getCurrency(),
+                price.getPrice(),
                 price.getCountryId(),
                 price.getStatus(),
                 price.getCreatedAt(),

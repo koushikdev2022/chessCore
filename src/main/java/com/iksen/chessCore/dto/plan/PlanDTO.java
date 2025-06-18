@@ -22,5 +22,5 @@ public class PlanDTO {
     private String avatar;
 
     private List<PlanPriceDTO> prices;
-    private List<PlanAccessDTO> accesses;
+    private List<PlanAccessMapDTO> accessMappings;
 }

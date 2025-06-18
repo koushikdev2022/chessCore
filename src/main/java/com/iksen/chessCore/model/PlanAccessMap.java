@@ -31,6 +31,9 @@ public class PlanAccessMap {
     private Plan plan;
 
     @Column(nullable = true)
+    private String desc ;
+
+    @Column(nullable = true)
     private Integer status = 1;
 
     @CreationTimestamp

@@ -51,8 +51,6 @@ public class BatchController {
                 } else {
                     batchEntities = batchServiceImpl.batches(batchIdArray);
                 }
-
-   
                 return ResponseEntity.ok(Map.of(
                     "status", true,
                     "message", "batch found",

@@ -9,4 +9,5 @@ import com.iksen.chessCore.model.Batch;
 
 public interface BatchService {
         List<BatchDTO> batches(Long[] ids);
+        List<BatchDTO> batchesWithPagination(Long[] ids, int page, int size);
 }

@@ -15,6 +15,7 @@ import com.iksen.chessCore.dto.auth.LoginDTO;
 import com.iksen.chessCore.dto.batch.BatchDTO;
 import com.iksen.chessCore.dto.batch.UserBatchMapDTO;
 import com.iksen.chessCore.dto.paginate.PaginateDTO;
+import com.iksen.chessCore.mapper.batch.BatchMapper;
 import com.iksen.chessCore.model.Batch;
 import com.iksen.chessCore.model.UserBatchMap;
 import com.iksen.chessCore.serviceImpl.batch.BatchServiceImpl;
@@ -37,13 +38,22 @@ public class BatchController {
                 Long[] batchIdArray = totalBatch.stream()
                         .map(UserBatchMapDTO::getBatchId)
                         .toArray(Long[]::new);
-                System.out.println(Arrays.toString(batchIdArray)+"batchIdArray");
-                List<BatchDTO> batch = batchServiceImpl.batches(batchIdArray);
+                List<BatchDTO> batchEntities;
+
+                if (paginateDTO != null) {
+                    int page = paginateDTO.getPage();
+                    int size = paginateDTO.getLimit();
+                    batchEntities = batchServiceImpl.batchesWithPagination(batchIdArray, page, size);
+                } else {
+                    batchEntities = batchServiceImpl.batches(batchIdArray);
+                }
+
+   
                 return ResponseEntity.ok(Map.of(
                     "status", true,
-                    "message", "country found",
+                    "message", "batch found",
                     "status_code", 200,
-                       "batch",batch
+                    "batch",batchEntities
                 ));
         }
 }

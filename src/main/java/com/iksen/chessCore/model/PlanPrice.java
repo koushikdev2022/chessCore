@@ -43,6 +43,9 @@ public class PlanPrice {
     @Column(name = "country_id")
     private Long countryId;
 
+    @Column(nullable = true, name = "per_interval")
+    private String perInterval;
+
     @Column(nullable = true)
     private Integer status = 1;
 

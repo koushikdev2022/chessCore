@@ -16,11 +16,13 @@ public class PlanDTO {
     private String planName;
     private String planShortName;
     private String planDescription;
+
     private Integer status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String avatar;
 
     private List<PlanPriceDTO> prices;
+    // private List<PlanAccessDTO> accesses;
     private List<PlanAccessMapDTO> accessMappings;
 }

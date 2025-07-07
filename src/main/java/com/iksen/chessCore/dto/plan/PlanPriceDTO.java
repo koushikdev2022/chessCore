@@ -18,6 +18,7 @@ public class PlanPriceDTO {
     private String currency;
     private String price;
     private Long countryId;
+        private String perInterval;
     private Integer status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

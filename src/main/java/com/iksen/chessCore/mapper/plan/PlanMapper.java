@@ -120,6 +120,7 @@ public class PlanMapper {
                 plan.getPlanName(),
                 plan.getPlanShortName(),
                 plan.getPlanDescription(),
+                 
                 plan.getStatus(),
                 plan.getCreatedAt(),
                 plan.getUpdatedAt(),
@@ -138,6 +139,7 @@ public class PlanMapper {
                 price.getCurrency(),
                 price.getPrice(),
                 price.getCountryId(),
+                price.getPerInterval(), 
                 price.getStatus(),
                 price.getCreatedAt(),
                 price.getUpdatedAt()

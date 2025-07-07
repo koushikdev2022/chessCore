@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iksen.chessCore.dto.auth.LoginDTO;
@@ -32,15 +33,18 @@ public class BatchController {
         @Autowired
         private UserBatchMapServiceImpl userBatchMapServiceImpl;
         @PostMapping("/list")
-        public ResponseEntity<?> batchList(@RequestBody(required = false) PaginateDTO paginateDTO){
+        public ResponseEntity<?> batchList(@RequestBody(required = false) PaginateDTO paginateDTO,  @RequestParam(required = false) Long id){
+            try{
                 Long userId = jwtUtill.getCurrentUserId();
                 List<UserBatchMapDTO> totalBatch =  userBatchMapServiceImpl.totalBatch(userId);
                 Long[] batchIdArray = totalBatch.stream()
                         .map(UserBatchMapDTO::getBatchId)
                         .toArray(Long[]::new);
                 List<BatchDTO> batchEntities;
-
-                if (paginateDTO != null) {
+                if(id != null){
+                    Long[] batchIdArrayNewSingleID = new Long[] { id };
+                    batchEntities = batchServiceImpl.batchesWithId(batchIdArrayNewSingleID);
+                }else if (paginateDTO != null) {
                     int page = paginateDTO.getPage();
                     int size = paginateDTO.getLimit();
                     batchEntities = batchServiceImpl.batchesWithPagination(batchIdArray, page, size);
@@ -55,5 +59,13 @@ public class BatchController {
                     "status_code", 200,
                     "batch",batchEntities
                 ));
+            }catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(400).body(Map.of(
+                    "status", false,
+                    "message", "Internal server error: " + e.getMessage(),
+                    "status_code", 400
+                ));
+            }
         }
 }

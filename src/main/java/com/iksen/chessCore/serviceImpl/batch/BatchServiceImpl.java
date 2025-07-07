@@ -31,4 +31,9 @@ public class BatchServiceImpl implements BatchService{
             Page<Batch> pageResult = batchRepository.findAllByIdIn(ids, pageable);
             return BatchMapper.toDTOList(pageResult.getContent()); 
         }
+        public  List<BatchDTO> batchesWithId(Long[] ids){
+            List<Batch> batchs =  batchRepository.findAllByIdIn(ids);
+            return BatchMapper.toDTOList(batchs);
+        }
+        
 }

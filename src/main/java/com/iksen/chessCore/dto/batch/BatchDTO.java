@@ -1,6 +1,7 @@
 package com.iksen.chessCore.dto.batch;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.iksen.chessCore.dto.coach.CoachDTO;
 
@@ -31,9 +32,9 @@ public class BatchDTO {
     private Integer status;
 
     private CoachDTO coach;
-    private BatchTimeDTO batchTimeDTO;
-    private BatchTimeClashDTO batchTimeClashDTO;
-    private BatchTimeCompleteDTO batchTimeCompleteDTO;
+    private List<BatchTimeDTO> batchTimeDTOs;
+    private List<BatchTimeClashDTO> batchTimeClashDTOs;
+    private List<BatchTimeCompleteDTO> batchTimeCompleteDTOs;
    
 }
 

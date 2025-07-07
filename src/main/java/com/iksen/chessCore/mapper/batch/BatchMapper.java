@@ -30,9 +30,10 @@ public class BatchMapper {
                 .endDate(batch.getEndDate())
                 .status(batch.getStatus())
                 .coach(toCoachDTO(batch.getCoach()))
-                .batchTimeDTO(toBatchTimeDTO(singleOrNull(batch.getBatcheTimes())))
-                .batchTimeClashDTO(toBatchTimeClashDTO(singleOrNull(batch.getBatcheTimeClash())))
-                .batchTimeCompleteDTO(toBatchTimeCompleteDTO(singleOrNull(batch.getBatcheTimeComplete())))
+                .batchTimeDTOs(toBatchTimeDTOList(batch.getBatcheTimes()))
+                .batchTimeClashDTOs(toBatchTimeClashDTOList(batch.getBatcheTimeClash()))
+                .batchTimeCompleteDTOs(toBatchTimeCompleteDTOList(batch.getBatcheTimeComplete()))
+
                 .build();
     }
 
@@ -154,5 +155,20 @@ public class BatchMapper {
 
     public static List<BatchDTO> toDTOList(List<Batch> batches) {
         return batches.stream().map(BatchMapper::toDTO).collect(Collectors.toList());
+    }
+
+    private static List<BatchTimeDTO> toBatchTimeDTOList(List<BatchTime> list) {
+        if (list == null) return null;
+        return list.stream().map(BatchMapper::toBatchTimeDTO).collect(Collectors.toList());
+    }
+
+    private static List<BatchTimeClashDTO> toBatchTimeClashDTOList(List<BatchTimeClash> list) {
+        if (list == null) return null;
+        return list.stream().map(BatchMapper::toBatchTimeClashDTO).collect(Collectors.toList());
+    }
+
+    private static List<BatchTimeCompleteDTO> toBatchTimeCompleteDTOList(List<BatchTimeClash> list) {
+        if (list == null) return null;
+        return list.stream().map(BatchMapper::toBatchTimeCompleteDTO).collect(Collectors.toList());
     }
 }

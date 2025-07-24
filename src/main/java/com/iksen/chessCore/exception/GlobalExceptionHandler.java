@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
@@ -165,5 +167,11 @@ public class GlobalExceptionHandler {
                element.getMethodName() + "(" + 
                element.getFileName() + ":" + 
                element.getLineNumber() + ")";
+    }
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex) {
+        return ResponseEntity
+                .status(422)
+                .body(ex.getMessage());
     }
 }
